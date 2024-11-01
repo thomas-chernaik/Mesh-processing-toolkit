@@ -1,0 +1,5 @@
+*.stash
+*.o
+*.pro
+triangle_renderer/triangle_renderer
+.*
