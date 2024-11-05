@@ -16,3 +16,5 @@ step 4:
     option2:
         ./face2faceindex
         the file will then be prompted
+
+the program will write to the same path but replace the .tri with .face
