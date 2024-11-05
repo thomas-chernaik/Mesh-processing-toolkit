@@ -1,0 +1,16 @@
+# University of Leeds 2024-2025
+# COMP 5893M Assignment 1
+# Thomas Chernaik
+# sc21trc
+#
+# Object Name: tetrahedron
+# Vertices=4 Faces=4
+#
+Vertex 0  -1  -1  -1
+Vertex 1  1  -1  1
+Vertex 2  -1  1  1
+Vertex 3  1  1  -1
+Face 0  0  1  2
+Face 1  0  2  3
+Face 2  0  3  1
+Face 3  3  2  1
