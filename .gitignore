@@ -3,3 +3,4 @@
 *.pro
 triangle_renderer/triangle_renderer
 .*
+*build*
