@@ -1,0 +1,28 @@
+# University of Leeds 2024-2025
+# COMP 5893M Assignment 1
+# Thomas Chernaik
+# sc21trc
+#
+# Object Name: cube
+# Vertices=8 Faces=12
+#
+Vertex 0  0  0  0
+Vertex 1  1  0  0
+Vertex 2  1  0  1
+Vertex 3  0  0  1
+Vertex 4  0  1  0
+Vertex 5  1  1  0
+Vertex 6  0  1  1
+Vertex 7  1  1  1
+Face 0  0  1  2
+Face 1  0  2  3
+Face 2  0  4  5
+Face 3  0  5  1
+Face 4  0  3  6
+Face 5  0  6  4
+Face 6  1  5  2
+Face 7  5  7  2
+Face 8  3  2  6
+Face 9  2  7  6
+Face 10  6  7  5
+Face 11  6  5  4

@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <algorithm>
 
 class Face2FaceIndex
 {
@@ -15,8 +16,7 @@ class Face2FaceIndex
     void readFile(std::string filename);
     // called to write the mesh stored in the instance to a .face file
     void writeFile(std::string filename);
-    // called to see what the output of writeFile would be but in the terminal
-    void printFile();
+
     
 
     private:
