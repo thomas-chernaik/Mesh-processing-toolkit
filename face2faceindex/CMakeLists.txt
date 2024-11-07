@@ -6,4 +6,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the executable
-add_executable(face2faceindex main.cpp face2faceindex.cpp)
+add_executable(face2faceindex main.cpp face2faceindex.cpp ../utilities/vertex.h
+        ../utilities/face.h ../utilities/face.cpp
+        ../utilities/vertex.cpp)

@@ -1,32 +1,11 @@
 #include "face2faceindex.h"
 
-bool Face2FaceIndex::Vertex::operator==(const Vertex& other)
-{
-    // checks that the 3 values in the vertex are equivalent
-    float epsilon = std::numeric_limits<float>::epsilon();
-    return std::abs(x - other.x) < epsilon && std::abs(y - other.y) < epsilon && std::abs(z - other.z) < epsilon;
-}
-int& Face2FaceIndex::Face::operator[](size_t index)
-{
-    switch(index)
-    {
-        case 0:
-        return vertex1;
-        case 1:
-        return vertex2;
-        case 2:
-        return vertex3;
-        default:
-        std::cerr << "You're indexing a face wrong." << std::endl;
-        exit(-4);
-    }
-}
 
 int Face2FaceIndex::getVertexIndex(Vertex vertex)
 {
     int index = -1;
     // do a linear search through the vertices and see if any match
-    for(int i = 0; i < vertices.size(); i++)
+    for (int i = 0; i < vertices.size(); i++)
     {
         if (vertices[i] == vertex)
         {
@@ -36,7 +15,7 @@ int Face2FaceIndex::getVertexIndex(Vertex vertex)
     }
     // if the index is still -1 then this vertex hasn't been found yet
     // so we add it to the vertex list as a new vertex
-    if(index == -1)
+    if (index == -1)
     {
         vertices.push_back(vertex);
         index = vertices.size() - 1;
@@ -73,14 +52,14 @@ void Face2FaceIndex::readFile(std::string filename)
             fileReader >> currentVertex.y;
             fileReader >> currentVertex.z;
             // get the vertex index for this vertex and assign it to the face
-            faces[faceIndex][vertexIndex] = getVertexIndex(currentVertex);   
+            faces[faceIndex][vertexIndex] = getVertexIndex(currentVertex);
         }
     }
     // check we don't have anything else left but white space
     char whiteSpaceCheckerChar;
     while (fileReader.get(whiteSpaceCheckerChar))
     {
-        if(!std::isspace(whiteSpaceCheckerChar))
+        if (!std::isspace(whiteSpaceCheckerChar))
         {
             std::cerr << "Finished reading the file but there are still non-whitespace characters left" << std::endl;
             exit(-5);
@@ -98,7 +77,7 @@ void Face2FaceIndex::writeFile(std::string filename)
     // if there isn't a slash at all lastSlash will be npos (-1)
     if (lastSlash != std::string::npos)
     {
-        objectName = objectName.substr(lastSlash+1);
+        objectName = objectName.substr(lastSlash + 1);
     }
     // open the file to write
     std::ofstream fileWriter(filename + ".face");
@@ -110,25 +89,22 @@ void Face2FaceIndex::writeFile(std::string filename)
 
     std::cout << "Writing the " << objectName << " to a .face file" << std::endl;
     // add the header comments in according to the specification
-    fileWriter << "# University of Leeds 2024-2025" << "\n"
-        << "# COMP 5893M Assignment 1" << "\n"
-        << "# Thomas Chernaik" << "\n"
-        << "# sc21trc" << "\n"
-        << "#" << "\n"
-        << "# Object Name: " << objectName << "\n"
-        << "# Vertices=" << vertices.size() << " Faces=" << faces.size() << "\n"
-        << "#" << "\n";
+    fileWriter << "# University of Leeds 2024-2025" << "\n" << "# COMP 5893M Assignment 1" << "\n"
+               << "# Thomas Chernaik" << "\n" << "# sc21trc" << "\n" << "#" << "\n" << "# Object Name: " << objectName
+               << "\n" << "# Vertices=" << vertices.size() << " Faces=" << faces.size() << "\n" << "#" << "\n";
 
     // write the vertices in
     for (int vertexIndex = 0; vertexIndex < vertices.size(); vertexIndex++)
     {
-        fileWriter << "Vertex " << vertexIndex << "  " << vertices[vertexIndex].x << "  " << vertices[vertexIndex].y << "  " << vertices[vertexIndex].z << "\n";
+        fileWriter << "Vertex " << vertexIndex << "  " << vertices[vertexIndex].x << "  " << vertices[vertexIndex].y
+                   << "  " << vertices[vertexIndex].z << "\n";
     }
-    
+
     // write the faces in
     for (int faceIndex = 0; faceIndex < faces.size(); faceIndex++)
     {
-        fileWriter << "Face " << faceIndex << "  " << faces[faceIndex][0] << "  " << faces[faceIndex][1] << "  " << faces[faceIndex][2] << "\n";
+        fileWriter << "Face " << faceIndex << "  " << faces[faceIndex][0] << "  " << faces[faceIndex][1] << "  "
+                   << faces[faceIndex][2] << "\n";
     }
 
     fileWriter.close();
