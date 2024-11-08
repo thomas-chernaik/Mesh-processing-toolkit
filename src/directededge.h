@@ -2,12 +2,12 @@
 // Created by thomas on 07/11/24.
 //
 
-#ifndef MODELLINGCWK1_FACEINDEX2DIRECTEDEDGE_H
-#define MODELLINGCWK1_FACEINDEX2DIRECTEDEDGE_H
+#ifndef MODELLINGCWK1_DIRECTEDEDGE_H
+#define MODELLINGCWK1_DIRECTEDEDGE_H
 using edge = int;
 
-#include "../utilities/vertex.h"
-#include "../utilities/face.h"
+#include "vertex.h"
+#include "face.h"
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +16,7 @@ using edge = int;
 
 
 
-class FaceIndex2DirectedEdge
+class DirectedEdge
 {
 public:
     // called to read a .face file into the instance
@@ -37,4 +37,4 @@ private:
 };
 
 
-#endif //MODELLINGCWK1_FACEINDEX2DIRECTEDEDGE_H
+#endif //MODELLINGCWK1_DIRECTEDEDGE_H

@@ -1,9 +1,10 @@
-#include "face2faceindex.h"
+#include "faceindex.h"
 
 
-int Face2FaceIndex::getVertexIndex(Vertex vertex)
+int FaceIndex::getVertexIndex(Vertex vertex)
 {
     int index = -1;
+    // TODO: optimise this to use a hash map or similar, alternately parallelise this
     // do a linear search through the vertices and see if any match
     for (int i = 0; i < vertices.size(); i++)
     {
@@ -23,7 +24,7 @@ int Face2FaceIndex::getVertexIndex(Vertex vertex)
     return index;
 }
 
-void Face2FaceIndex::readFile(std::string filename)
+void FaceIndex::readFile(std::string filename)
 {
     // clear the faces and vertices vectors in case they already contain a mesh
     faces.clear();
@@ -68,7 +69,7 @@ void Face2FaceIndex::readFile(std::string filename)
     std::cout << "Successfully read in " << numFaces << " faces from " << filename << std::endl;
 }
 
-void Face2FaceIndex::writeFile(std::string filename)
+void FaceIndex::writeFile(std::string filename)
 {
     // get the object name to put in the header data, and give easier to read outputs
     std::string objectName = filename;

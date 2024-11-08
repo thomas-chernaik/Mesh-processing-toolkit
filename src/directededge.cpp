@@ -3,9 +3,9 @@
 //
 
 #include <sstream>
-#include "faceindex2directededge.h"
+#include "directededge.h"
 
-void FaceIndex2DirectedEdge::readFile(std::string filename)
+void DirectedEdge::readFile(std::string filename)
 {
     // clear the faces and vertices vectors in case they already contain a mesh
     faces.clear();
@@ -111,7 +111,7 @@ void FaceIndex2DirectedEdge::readFile(std::string filename)
     constructDirectedEdges();
 }
 
-void FaceIndex2DirectedEdge::constructDirectedEdges()
+void DirectedEdge::constructDirectedEdges()
 {
     // clear the directed edges and other half vectors
     directedEdges.clear();
@@ -120,6 +120,7 @@ void FaceIndex2DirectedEdge::constructDirectedEdges()
     directedEdges.resize(vertices.size(), -1);
     // we will have numFaces * 3 other half edges
     otherHalf.resize(faces.size() * 3, -1);
+    // TODO: optimise - this is currently O(v * e) where v is the number of vertices and e is the number of edges
     // for each directed edge
     for (int i = 0; i < directedEdges.size(); i++)
     {
@@ -158,6 +159,7 @@ void FaceIndex2DirectedEdge::constructDirectedEdges()
         int vStart = faces[f][e % 3];
         // find the vertex that is the end of this edge
         int vEnd = faces[f][(e + 1) % 3];
+        // TODO: optimise so that it adds both pairs of edges at the same time
         // search through all the edges again to find the other half
         for (int e2 = 0; e2 < otherHalf.size(); e2++)
         {
@@ -183,7 +185,7 @@ void FaceIndex2DirectedEdge::constructDirectedEdges()
     }
 }
 
-void FaceIndex2DirectedEdge::writeFile(std::string filename)
+void DirectedEdge::writeFile(std::string filename)
 {
     // get the object name to put in the header data, and give easier to read outputs
     std::string objectName = filename;

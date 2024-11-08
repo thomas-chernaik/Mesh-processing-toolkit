@@ -1,4 +1,4 @@
-#include "faceindex2directededge.h"
+#include "../src/directededge.h"
 
 int main(int argc, char** argv)
 {
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         return -2;
     }
     std::cout << "Converting " << filename << " to a .diredge file" << std::endl;
-    FaceIndex2DirectedEdge f2de;
+    DirectedEdge f2de;
     f2de.readFile(filename);
     // get the file name without the extension (last 5 characters)
     filename.resize(filename.size() - 5);

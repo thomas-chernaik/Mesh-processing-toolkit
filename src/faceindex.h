@@ -7,10 +7,10 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-#include "../utilities/vertex.h"
-#include "../utilities/face.h"
+#include "vertex.h"
+#include "face.h"
 
-class Face2FaceIndex
+class FaceIndex
 {
 public:
 
