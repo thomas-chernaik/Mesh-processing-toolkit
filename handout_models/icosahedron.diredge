@@ -1,0 +1,112 @@
+# University of Leeds 2024-2025
+# COMP 5893M Assignment 1
+# Thomas Chernaik
+# sc21trc
+#
+# Object Name: icosahedron
+# Vertices=12 Faces=20
+#
+Vertex 0  0  1.61803  1
+Vertex 1  -1  0  1.61803
+Vertex 2  1  0  1.61803
+Vertex 3  1.61803  1  0
+Vertex 4  0  1.61803  -1
+Vertex 5  -1.61803  1  0
+Vertex 6  0  -1.61803  1
+Vertex 7  1.61803  -1  0
+Vertex 8  1  0  -1.61803
+Vertex 9  -1  0  -1.61803
+Vertex 10  -1.61803  -1  0
+Vertex 11  0  -1.61803  -1
+FirstDirectedEdge 0  0
+FirstDirectedEdge 1  1
+FirstDirectedEdge 2  2
+FirstDirectedEdge 3  5
+FirstDirectedEdge 4  8
+FirstDirectedEdge 5  11
+FirstDirectedEdge 6  17
+FirstDirectedEdge 7  20
+FirstDirectedEdge 8  23
+FirstDirectedEdge 9  26
+FirstDirectedEdge 10  29
+FirstDirectedEdge 11  45
+Face 0  0  1  2
+Face 1  0  2  3
+Face 2  0  3  4
+Face 3  0  4  5
+Face 4  0  5  1
+Face 5  2  1  6
+Face 6  3  2  7
+Face 7  4  3  8
+Face 8  5  4  9
+Face 9  1  5  10
+Face 10  2  6  7
+Face 11  3  7  8
+Face 12  4  8  9
+Face 13  5  9  10
+Face 14  1  10  6
+Face 15  11  7  6
+Face 16  11  8  7
+Face 17  11  9  8
+Face 18  11  10  9
+Face 19  11  6  10
+OtherHalf 0  14
+OtherHalf 1  15
+OtherHalf 2  3
+OtherHalf 3  2
+OtherHalf 4  18
+OtherHalf 5  6
+OtherHalf 6  5
+OtherHalf 7  21
+OtherHalf 8  9
+OtherHalf 9  8
+OtherHalf 10  24
+OtherHalf 11  12
+OtherHalf 12  11
+OtherHalf 13  27
+OtherHalf 14  0
+OtherHalf 15  1
+OtherHalf 16  44
+OtherHalf 17  30
+OtherHalf 18  4
+OtherHalf 19  32
+OtherHalf 20  33
+OtherHalf 21  7
+OtherHalf 22  35
+OtherHalf 23  36
+OtherHalf 24  10
+OtherHalf 25  38
+OtherHalf 26  39
+OtherHalf 27  13
+OtherHalf 28  41
+OtherHalf 29  42
+OtherHalf 30  17
+OtherHalf 31  46
+OtherHalf 32  19
+OtherHalf 33  20
+OtherHalf 34  49
+OtherHalf 35  22
+OtherHalf 36  23
+OtherHalf 37  52
+OtherHalf 38  25
+OtherHalf 39  26
+OtherHalf 40  55
+OtherHalf 41  28
+OtherHalf 42  29
+OtherHalf 43  58
+OtherHalf 44  16
+OtherHalf 45  50
+OtherHalf 46  31
+OtherHalf 47  57
+OtherHalf 48  53
+OtherHalf 49  34
+OtherHalf 50  45
+OtherHalf 51  56
+OtherHalf 52  37
+OtherHalf 53  48
+OtherHalf 54  59
+OtherHalf 55  40
+OtherHalf 56  51
+OtherHalf 57  47
+OtherHalf 58  43
+OtherHalf 59  54
