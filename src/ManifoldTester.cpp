@@ -95,6 +95,46 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
         std::abs(distances1[2]) < e)
     {
         // TODO: test 2D
+        // project the vertices of the faces onto the plane of the first face
+        // if the 2D triangles intersect then the 3D triangles intersect
+        Cartesian3 triangle1[3];
+        Cartesian3 triangle2[3];
+        for (int v = 0; v < 3; v++)
+        {
+            triangle1[v] = VertexToCartesian3(vertices[faces[f1][v]]);
+            triangle2[v] = VertexToCartesian3(vertices[faces[f2][v]]);
+        }
+        // project the vertices onto the plane
+        for (int v = 0; v < 3; v++)
+        {
+            triangle1[v] = triangle1[v] - face1Normal * dotProduct(face1Normal, triangle1[v] - VertexToCartesian3(
+                    vertices[faces[f1][0]]));
+            triangle2[v] = triangle2[v] - face1Normal * dotProduct(face1Normal, triangle2[v] - VertexToCartesian3(
+                    vertices[faces[f1][0]]));
+        }
+        for (int v1 = 0; v1 < 3; v1++)
+        {
+            for (int v2 = 0; v2 < 3; v2++)
+            {
+                if (EdgesIntersect(triangle1[v1], triangle1[(v1 + 1) % 3], triangle2[v2], triangle2[(v2 + 1) % 3]))
+                {
+                    return true;
+                }
+            }
+        }
+        // if the edges don't intersect than either one triangle contains the other, or they don't intersect
+        for(int v1 = 0; v1 < 3; v1++)
+        {
+            if(TriangleContainsVertex(triangle2[0], triangle2[1], triangle2[2], triangle1[v1]))
+            {
+                return true;
+            }
+            if(TriangleContainsVertex(triangle1[0], triangle1[1], triangle1[2], triangle2[v1]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     // if all the distances1 are the same sign then the faces don't intersect
@@ -110,11 +150,12 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     // calculate the 2 edges of the first face that will intersect the plane of the second face
     // one vertex will have a different sign to the other two
     int oddVertex1 = 2;
-    if ((distances1[0] < e && distances1[1] > -e && distances1[2] > -e) || (distances1[0] > -e && distances1[1] < e && distances1[2] < e))
+    if ((distances1[0] < e && distances1[1] > -e && distances1[2] > -e) ||
+        (distances1[0] > -e && distances1[1] < e && distances1[2] < e))
     {
         oddVertex1 = 0;
-    }
-    else if ((distances1[1] < e && distances1[0] > -e && distances1[2] > -e) || (distances1[1] > -e && distances1[0] < e && distances1[2] < e))
+    } else if ((distances1[1] < e && distances1[0] > -e && distances1[2] > -e) ||
+               (distances1[1] > -e && distances1[0] < e && distances1[2] < e))
     {
         oddVertex1 = 1;
     }
@@ -143,18 +184,19 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     // calculate the 2 edges of the first face that will intersect the plane of the second face
     // one vertex will have a different sign to the other two
     int oddVertex2 = 2;
-    if ((distances2[0] < e && distances2[1] > -e && distances2[2] > -e) || (distances2[0] > -e && distances2[1] < e && distances2[2] < e))
+    if ((distances2[0] < e && distances2[1] > -e && distances2[2] > -e) ||
+        (distances2[0] > -e && distances2[1] < e && distances2[2] < e))
     {
         oddVertex2 = 0;
-    }
-    else if ((distances2[1] < e && distances2[0] > -e && distances2[2] > -e) || (distances2[1] > -e && distances2[0] < e && distances2[2] < e))
+    } else if ((distances2[1] < e && distances2[0] > -e && distances2[2] > -e) ||
+               (distances2[1] > -e && distances2[0] < e && distances2[2] < e))
     {
         oddVertex2 = 1;
     }
 
 
     // check if the two faces are parallel
-    if (face1Normal.cross(face2Normal).length() < 1e-6)
+    if (face1Normal.cross(face2Normal).length() < e)
     {
         // we have an earlier test for them being coplanar
         // if they are parallel then they don't intersect
@@ -162,30 +204,29 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     }
     // calculate the intersection line of the two planes
     Cartesian3 intersectionLine = face1Normal.cross(face2Normal);
-    float maxComponent = std::max(std::abs(intersectionLine.x), std::max(std::abs(intersectionLine.y), std::abs(intersectionLine.z)));
+    float maxComponent = std::max(std::abs(intersectionLine.x),
+                                  std::max(std::abs(intersectionLine.y), std::abs(intersectionLine.z)));
     float face1Projected[3];
     float face2Projected[3];
 
     // using equation 6 from https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf to project the vertices onto the intersection line
     if (std::abs(intersectionLine.x) == maxComponent)
     {
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             face1Projected[i] = vertices[faces[f1][i]].x;
             face2Projected[i] = vertices[faces[f2][i]].x;
         }
-    }
-    else if (std::abs(intersectionLine.y) == maxComponent)
+    } else if (std::abs(intersectionLine.y) == maxComponent)
     {
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             face1Projected[i] = vertices[faces[f1][i]].y;
             face2Projected[i] = vertices[faces[f2][i]].y;
         }
-    }
-    else
+    } else
     {
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             face1Projected[i] = vertices[faces[f1][i]].z;
             face2Projected[i] = vertices[faces[f2][i]].z;
@@ -194,10 +235,18 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
 
     // calculate the t values for the intersection line
     float f1t1, f1t2, f2t1, f2t2;
-    f1t1 = face1Projected[oddVertex1] + (face1Projected[(oddVertex1 + 1) % 3] - face1Projected[oddVertex1]) * distances1[oddVertex1] / (distances1[oddVertex1] - distances1[(oddVertex1 + 1) % 3]);
-    f1t2 = face1Projected[oddVertex1] + (face1Projected[(oddVertex1 + 2) % 3] - face1Projected[oddVertex1]) * distances1[oddVertex1] / (distances1[oddVertex1] - distances1[(oddVertex1 + 2) % 3]);
-    f2t1 = face2Projected[oddVertex2] + (face2Projected[(oddVertex2 + 1) % 3] - face2Projected[oddVertex2]) * distances2[oddVertex2] / (distances2[oddVertex2] - distances2[(oddVertex2 + 1) % 3]);
-    f2t2 = face2Projected[oddVertex2] + (face2Projected[(oddVertex2 + 2) % 3] - face2Projected[oddVertex2]) * distances2[oddVertex2] / (distances2[oddVertex2] - distances2[(oddVertex2 + 2) % 3]);
+    f1t1 = face1Projected[oddVertex1] +
+           (face1Projected[(oddVertex1 + 1) % 3] - face1Projected[oddVertex1]) * distances1[oddVertex1] /
+           (distances1[oddVertex1] - distances1[(oddVertex1 + 1) % 3]);
+    f1t2 = face1Projected[oddVertex1] +
+           (face1Projected[(oddVertex1 + 2) % 3] - face1Projected[oddVertex1]) * distances1[oddVertex1] /
+           (distances1[oddVertex1] - distances1[(oddVertex1 + 2) % 3]);
+    f2t1 = face2Projected[oddVertex2] +
+           (face2Projected[(oddVertex2 + 1) % 3] - face2Projected[oddVertex2]) * distances2[oddVertex2] /
+           (distances2[oddVertex2] - distances2[(oddVertex2 + 1) % 3]);
+    f2t2 = face2Projected[oddVertex2] +
+           (face2Projected[(oddVertex2 + 2) % 3] - face2Projected[oddVertex2]) * distances2[oddVertex2] /
+           (distances2[oddVertex2] - distances2[(oddVertex2 + 2) % 3]);
     // make sure t1 < t2
     if (f1t1 > f1t2)
     {
@@ -237,7 +286,7 @@ std::vector<Edge> ManifoldTester::getOneRing(int vertexIndex)
     // get the one ring of a vertex by finding all the edges that are incident to the vertex
     std::vector<Edge> oneRing;
     // for each face
-    for (auto & face : faces)
+    for (auto &face: faces)
     {
         // check if the face contains the vertex
         for (int v = 0; v < 3; v++)
@@ -257,11 +306,11 @@ bool ManifoldTester::isSingleCycle(std::vector<Edge> edges)
     // follow the cycle
     int numTraversalsLeft;
     Edge currentEdge = edges[0];
-    for (numTraversalsLeft = (int)edges.size() - 1; numTraversalsLeft > 0; numTraversalsLeft--)
+    for (numTraversalsLeft = (int) edges.size() - 1; numTraversalsLeft > 0; numTraversalsLeft--)
     {
         // find the next edge - this is the edge that has the same start as the current edge's end
         bool foundNextEdge = false;
-        for (auto & edge : edges)
+        for (auto &edge: edges)
         {
             if (edge.start == currentEdge.end)
             {
@@ -284,4 +333,27 @@ bool ManifoldTester::isSingleCycle(std::vector<Edge> edges)
     }
     // if we this edge connects back to the start then it is a single cycle
     return currentEdge.end == edges[0].start;
+}
+
+bool ManifoldTester::EdgesIntersect(Cartesian3 v1, Cartesian3 v2, Cartesian3 v3, Cartesian3 v4)
+{
+    //TODO: implement segment segment intersection
+return false;
+}
+
+bool ManifoldTester::TriangleContainsVertex(const Cartesian3 &v1, const Cartesian3 &v2, const Cartesian3 &v3,
+                                            const Cartesian3 &point)
+{
+    // TODO: implement point in triangle test
+    return false;
+}
+
+int ManifoldTester::CalculateGenus()
+{
+    // in any orientable mesh/polyhedron, the Euler characteristic is given by V - E + F = 2 - 2g
+    // therefore, g = (2 - V + E - F) / 2
+    // V can be found as the vertices.size()
+    // E can be found as the size of otherHalf divided by 2
+    // F can be found as the faces.size()
+    return (2 - vertices.size() + otherHalf.size() / 2 - faces.size()) / 2;
 }

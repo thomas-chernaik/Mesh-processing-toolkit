@@ -10,13 +10,16 @@
 #include "../triangle_renderer/Cartesian3.h"
 
 
-
 // class manifold tester extends DirectedEdge, also containing methods to test for manifoldness
 class ManifoldTester : public DirectedEdge
 {
 public:
     // method to test if the mesh is manifold
     void testManifold();
+
+    // method to calculate the genus of the mesh using the euler formula
+    int CalculateGenus();
+
 
 private:
     // method to test if the mesh has any pinch points
@@ -37,19 +40,30 @@ private:
     // method to check if a list of edges is a single cycle
     static bool isSingleCycle(std::vector<Edge> edges);
 
-    float dotProduct(const Cartesian3 &a, const Cartesian3 &b)
-    {
-        return a.x * b.x + a.y * b.y + a.z * b.z;
-    }
-    float dotProduct(const Cartesian3 &a, const Vertex &b)
+    // returns the dot product of two Cartesian3 vectors
+    static float dotProduct(const Cartesian3 &a, const Cartesian3 &b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
 
-    Cartesian3 VertexToCartesian3(const Vertex &v)
+    // returns the dot product of a Cartesian3 vector and a Vertex data type
+    static float dotProduct(const Cartesian3 &a, const Vertex &b)
+    {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    // converts a Vertex to a Cartesian3
+    static Cartesian3 VertexToCartesian3(const Vertex &v)
     {
         return {v.x, v.y, v.z};
     }
+
+    // returns if two line segments intersect
+    inline bool EdgesIntersect(Cartesian3 v1, Cartesian3 v2, Cartesian3 v3, Cartesian3 v4);
+
+    // returns if a point is inside a triangle
+    inline bool
+    TriangleContainsVertex(const Cartesian3 &v1, const Cartesian3 &v2, const Cartesian3 &v3, const Cartesian3 &point);
 
 };
 

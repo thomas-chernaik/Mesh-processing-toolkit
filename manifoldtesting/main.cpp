@@ -43,5 +43,9 @@ int main(int argc, char **argv)
     // if the program hasn't exited then the mesh is manifold
     std::cout << "The mesh is manifold" << std::endl;
 
+    // calculate the genus of the mesh
+    int genus = mt.CalculateGenus();
+    std::cout << "The genus of the mesh is " << genus << std::endl;
+
     return 0;
 }
