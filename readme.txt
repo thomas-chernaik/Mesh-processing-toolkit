@@ -23,3 +23,9 @@ The face index to directed edge converter program (Question 1(b)) can be run as 
 ./<path_to_build>/faceindex2directededge/faceindex2directededge [path_to_.face_file]
 if no path is given, the program will prompt for the path.
 A .diredge file will be created at the same path as the .face file, with the same name.
+
+The manifold testing program (Question 2) can be run as follows:
+./<path_to_build>/manifoldtest/manifoldtest [path_to_.tri_file] [path_to_.face_file]
+if no path is given, the program will prompt for the path.
+A .diredge file will be created at the same path as the .face file, and if applicable, a .face file will be created at the same path as the .tri file, with the same name.
+The program will output whether the mesh is a manifold or not, and if not manifold, will explain why.

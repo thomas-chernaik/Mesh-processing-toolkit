@@ -1,0 +1,72 @@
+# University of Leeds 2024-2025
+# COMP 5893M Assignment 1
+# Thomas Chernaik
+# sc21trc
+#
+# Object Name: cube
+# Vertices=8 Faces=12
+#
+Vertex 0  0  0  0
+Vertex 1  1  0  0
+Vertex 2  1  0  1
+Vertex 3  0  0  1
+Vertex 4  0  1  0
+Vertex 5  1  1  0
+Vertex 6  0  1  1
+Vertex 7  1  1  1
+FirstDirectedEdge 0  0
+FirstDirectedEdge 1  1
+FirstDirectedEdge 2  2
+FirstDirectedEdge 3  5
+FirstDirectedEdge 4  7
+FirstDirectedEdge 5  8
+FirstDirectedEdge 6  14
+FirstDirectedEdge 7  22
+Face 0  0  1  2
+Face 1  0  2  3
+Face 2  0  4  5
+Face 3  0  5  1
+Face 4  0  3  6
+Face 5  0  6  4
+Face 6  1  5  2
+Face 7  5  7  2
+Face 8  3  2  6
+Face 9  2  7  6
+Face 10  6  7  5
+Face 11  6  5  4
+OtherHalf 0  11
+OtherHalf 1  20
+OtherHalf 2  3
+OtherHalf 3  2
+OtherHalf 4  24
+OtherHalf 5  12
+OtherHalf 6  17
+OtherHalf 7  34
+OtherHalf 8  9
+OtherHalf 9  8
+OtherHalf 10  18
+OtherHalf 11  0
+OtherHalf 12  5
+OtherHalf 13  26
+OtherHalf 14  15
+OtherHalf 15  14
+OtherHalf 16  35
+OtherHalf 17  6
+OtherHalf 18  10
+OtherHalf 19  23
+OtherHalf 20  1
+OtherHalf 21  31
+OtherHalf 22  27
+OtherHalf 23  19
+OtherHalf 24  4
+OtherHalf 25  29
+OtherHalf 26  13
+OtherHalf 27  22
+OtherHalf 28  30
+OtherHalf 29  25
+OtherHalf 30  28
+OtherHalf 31  21
+OtherHalf 32  33
+OtherHalf 33  32
+OtherHalf 34  7
+OtherHalf 35  16

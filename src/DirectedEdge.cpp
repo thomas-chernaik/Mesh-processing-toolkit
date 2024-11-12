@@ -3,7 +3,10 @@
 //
 
 #include <sstream>
-#include "directededge.h"
+#include <chrono>
+#include "DirectedEdge.h"
+
+
 
 void DirectedEdge::readFile(std::string filename)
 {
@@ -113,6 +116,8 @@ void DirectedEdge::readFile(std::string filename)
 
 void DirectedEdge::constructDirectedEdges()
 {
+    // start a timer
+    auto start = std::chrono::high_resolution_clock::now();
     // clear the directed edges and other half vectors
     directedEdges.clear();
     otherHalf.clear();
@@ -137,9 +142,16 @@ void DirectedEdge::constructDirectedEdges()
                     // this is faces * 3 + v
                     // only set the directed edge if it hasn't been set yet, we want the first one (for funsies, technically we could use any)
                     if (directedEdges[i] == -1)
+                    {
                         directedEdges[i] = f * 3 + v;
+                        break;
+                    }
 
                 }
+            }
+            if (directedEdges[i] != -1)
+            {
+                break;
             }
         }
         // if we didn't find a directed edge then we don't have a manifold mesh
@@ -149,10 +161,21 @@ void DirectedEdge::constructDirectedEdges()
             exit(-4);
         }
     }
+    // stop the timer
+    auto stop = std::chrono::high_resolution_clock::now();
+    // output the time taken
+    std::cout << "Directed edges took "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+              << " milliseconds" << std::endl;
 
+    start = std::chrono::high_resolution_clock::now();
     // for each edge
     for (int e = 0; e < otherHalf.size(); e++)
     {
+        if (otherHalf[e] != -1)
+        {
+            continue;
+        }
         // find the face that contains this edge
         int f = e / 3;
         // find the vertex that is the start of this edge
@@ -161,10 +184,10 @@ void DirectedEdge::constructDirectedEdges()
         int vEnd = faces[f][(e + 1) % 3];
         // TODO: optimise so that it adds both pairs of edges at the same time
         // search through all the edges again to find the other half
-        for (int e2 = 0; e2 < otherHalf.size(); e2++)
+        for (int e2 = e+1; e2 < otherHalf.size(); e2++)
         {
             // if the edge is the other half
-            if (e2 != e && faces[e2 / 3][e2 % 3] == vEnd && faces[e2 / 3][(e2 + 1) % 3] == vStart)
+            if (faces[e2 / 3][e2 % 3] == vEnd && faces[e2 / 3][(e2 + 1) % 3] == vStart)
             {
                 // if there is already an other half then we don't have a manifold mesh
                 if (otherHalf[e] != -1)
@@ -174,6 +197,8 @@ void DirectedEdge::constructDirectedEdges()
                 }
                 // set the other half to be the edge index
                 otherHalf[e] = e2;
+                otherHalf[e2] = e;
+                break;
             }
         }
         // if we didn't find an other half then we don't have a manifold mesh
@@ -183,6 +208,12 @@ void DirectedEdge::constructDirectedEdges()
             exit(-4);
         }
     }
+    // stop the timer
+    stop = std::chrono::high_resolution_clock::now();
+    // output the time taken
+    std::cout << "Other half edges took "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+              << " milliseconds" << std::endl;
 }
 
 void DirectedEdge::writeFile(std::string filename)

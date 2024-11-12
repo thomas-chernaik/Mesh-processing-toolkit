@@ -21,6 +21,16 @@ struct Vertex
         float epsilon = std::numeric_limits<float>::epsilon();
         return std::abs(x - other.x) < epsilon && std::abs(y - other.y) < epsilon && std::abs(z - other.z) < epsilon;
     }
+
+    Vertex operator-(const Vertex &other) const
+    {
+        return {x - other.x, y - other.y, z - other.z};
+    }
+    Vertex operator+(const Vertex &other) const
+    {
+        return {x + other.x, y + other.y, z + other.z};
+    }
+
 };
 extern Vertex nullVertex;
 #endif //FACEINDEX2DIRECTEDEDGE_VERTEX_H

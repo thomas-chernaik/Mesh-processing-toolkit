@@ -1,4 +1,4 @@
-#include "faceindex.h"
+#include "FaceIndex.h"
 
 
 int FaceIndex::getVertexIndex(Vertex vertex)
@@ -54,6 +54,18 @@ void FaceIndex::readFile(std::string filename)
             fileReader >> currentVertex.z;
             // get the vertex index for this vertex and assign it to the face
             faces[faceIndex][vertexIndex] = getVertexIndex(currentVertex);
+        }
+        // check that the face has 3 unique vertices
+        if (faces[faceIndex][0] == faces[faceIndex][1] || faces[faceIndex][0] == faces[faceIndex][2] ||
+            faces[faceIndex][1] == faces[faceIndex][2])
+        {
+            // TODO: decide whether this should be an error or just a warning
+            std::cerr << "Face " << faceIndex << " has repeated vertices and is not a valid triangle" << std::endl;
+            // exit(-3);
+            // we can discard the face as it isn't a triangle
+            numFaces--;
+            faces.pop_back();
+            faceIndex--;
         }
     }
     // check we don't have anything else left but white space

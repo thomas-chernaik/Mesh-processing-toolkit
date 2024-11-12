@@ -1,4 +1,4 @@
-#include "../src/faceindex.h"
+#include "../src/FaceIndex.h"
 
 int main(int argc, char** argv)
 {

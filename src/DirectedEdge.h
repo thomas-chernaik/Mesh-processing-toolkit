@@ -25,7 +25,7 @@ public:
     // called to write the mesh stored in the instance to a .directededge file
     void writeFile(std::string filename);
 
-private:
+protected:
 
     // called to compute the directed edges from the indexed faces
     void constructDirectedEdges();

@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
 # Add the executable
-add_executable(faceindex2directededge main.cpp ../src/directededge.cpp)
+add_executable(faceindex2directededge main.cpp ../src/DirectedEdge.cpp)
 
 
 

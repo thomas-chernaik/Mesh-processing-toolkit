@@ -1,4 +1,4 @@
-#include "../src/directededge.h"
+#include "../src/DirectedEdge.h"
 
 int main(int argc, char** argv)
 {

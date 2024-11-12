@@ -2,7 +2,9 @@
 // Created by thomas on 08/11/24.
 //
 
-#include "manifoldtesting.h"
+#include "../src/ManifoldTester.h"
+#include "../src/FaceIndex.h"
+
 
 int main(int argc, char **argv)
 {
@@ -20,19 +22,25 @@ int main(int argc, char **argv)
         std::cerr << "Please enter at most one command line argument." << std::endl;
         return -1;
     }
-    // check that the filename ends in .tri
-    if (filename.size() <= 4)
+    // if the filename ends in .tri then we convert it to a .face file
+    if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".tri")
     {
-        std::cerr << "The filename is not for a .tri file" << std::endl;
-        return -2;
-    } else if (filename.substr(filename.size() - 4) != ".tri")
-    {
-        std::cerr << "The filename is not for a .tri file" << std::endl;
-        return -2;
+        std::cout << "Converting " << filename << " to a .face file" << std::endl;
+        FaceIndex fi;
+        fi.readFile(filename);
+        // get the file name without the extension (last 4 characters)
+        filename.resize(filename.size() - 4);
+        filename = filename;
+        fi.writeFile(filename);
+        filename = filename + ".face";
     }
-    ManifoldTesting mt;
-    mt.LoadMesh(filename);
 
+    // create a manifold tester and test the mesh
+    ManifoldTester mt;
+    mt.readFile(filename);
+    mt.testManifold();
+
+    // if the program hasn't exited then the mesh is manifold
     std::cout << "The mesh is manifold" << std::endl;
 
     return 0;
