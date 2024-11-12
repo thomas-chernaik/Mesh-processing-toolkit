@@ -237,15 +237,15 @@ std::vector<Edge> ManifoldTester::getOneRing(int vertexIndex)
     // get the one ring of a vertex by finding all the edges that are incident to the vertex
     std::vector<Edge> oneRing;
     // for each face
-    for (int f = 0; f < faces.size(); f++)
+    for (auto & face : faces)
     {
         // check if the face contains the vertex
         for (int v = 0; v < 3; v++)
         {
-            if (faces[f][v] == vertexIndex)
+            if (face[v] == vertexIndex)
             {
                 // add the edge to the one ring
-                oneRing.push_back(Edge{faces[f][(v + 1) % 3], faces[f][(v + 2) % 3]});
+                oneRing.push_back(Edge{face[(v + 1) % 3], face[(v + 2) % 3]});
             }
         }
     }
@@ -257,15 +257,15 @@ bool ManifoldTester::isSingleCycle(std::vector<Edge> edges)
     // follow the cycle
     int numTraversalsLeft;
     Edge currentEdge = edges[0];
-    for (numTraversalsLeft = edges.size() - 1; numTraversalsLeft > 0; numTraversalsLeft--)
+    for (numTraversalsLeft = (int)edges.size() - 1; numTraversalsLeft > 0; numTraversalsLeft--)
     {
         // find the next edge - this is the edge that has the same start as the current edge's end
         bool foundNextEdge = false;
-        for (int i = 0; i < edges.size(); i++)
+        for (auto & edge : edges)
         {
-            if (edges[i].start == currentEdge.end)
+            if (edge.start == currentEdge.end)
             {
-                currentEdge = edges[i];
+                currentEdge = edge;
                 foundNextEdge = true;
                 break;
             }

@@ -15,10 +15,10 @@ class FaceIndex
 public:
 
     // called to read a .tri file into the instance
-    void readFile(std::string filename);
+    void readFile(const std::string& filename);
 
     // called to write the mesh stored in the instance to a .face file
-    void writeFile(std::string filename);
+    void writeFile(const std::string& filename);
 
 
 private:

@@ -8,7 +8,7 @@
 
 
 
-void DirectedEdge::readFile(std::string filename)
+void DirectedEdge::readFile(const std::string& filename)
 {
     // clear the faces and vertices vectors in case they already contain a mesh
     faces.clear();
@@ -30,13 +30,12 @@ void DirectedEdge::readFile(std::string filename)
             break;
         }
     }
-    Vertex currentVertex;
     int currentIndex;
     // we are reading vertices while the line's first word is Vertex
     while (line.substr(0, 6) == "Vertex")
     {
         // create a new vertex
-        Vertex vertex;
+        Vertex vertex{};
         // split up the line by whitespace
         // [0] = "Vertex", [1] = index, [2] = x, [3] = y, [4] = z
         std::istringstream lineStream(line);
@@ -65,7 +64,7 @@ void DirectedEdge::readFile(std::string filename)
     while (line.substr(0, 4) == "Face")
     {
         // create a new face
-        Face face;
+        Face face{};
         // split up the line by whitespace
         // [0] = "Face", [1] = index, [2] = vertex1, [3] = vertex2, [4] = vertex3
         std::istringstream lineStream(line);
@@ -189,7 +188,7 @@ void DirectedEdge::constructDirectedEdges()
             // if the edge is the other half
             if (faces[e2 / 3][e2 % 3] == vEnd && faces[e2 / 3][(e2 + 1) % 3] == vStart)
             {
-                // if there is already an other half then we don't have a manifold mesh
+                // if there is already another half then we don't have a manifold mesh
                 if (otherHalf[e] != -1)
                 {
                     std::cerr << "Mesh is not manifold as edge " << e << " has multiple other halves" << std::endl;
@@ -201,7 +200,7 @@ void DirectedEdge::constructDirectedEdges()
                 break;
             }
         }
-        // if we didn't find an other half then we don't have a manifold mesh
+        // if we didn't find another half then we don't have a manifold mesh
         if (otherHalf[e] == -1)
         {
             std::cerr << "Mesh is not manifold as edge " << e << " has no other half" << std::endl;
@@ -216,7 +215,7 @@ void DirectedEdge::constructDirectedEdges()
               << " milliseconds" << std::endl;
 }
 
-void DirectedEdge::writeFile(std::string filename)
+void DirectedEdge::writeFile(const std::string& filename)
 {
     // get the object name to put in the header data, and give easier to read outputs
     std::string objectName = filename;

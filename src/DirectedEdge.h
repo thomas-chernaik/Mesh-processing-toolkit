@@ -20,10 +20,10 @@ class DirectedEdge
 {
 public:
     // called to read a .face file into the instance
-    void readFile(std::string filename);
+    void readFile(const std::string& filename);
 
     // called to write the mesh stored in the instance to a .directededge file
-    void writeFile(std::string filename);
+    void writeFile(const std::string& filename);
 
 protected:
 

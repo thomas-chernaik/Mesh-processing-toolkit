@@ -4,7 +4,7 @@
 int FaceIndex::getVertexIndex(Vertex vertex)
 {
     int index = -1;
-    // TODO: optimise this to use a hash map or similar, alternately parallelise this
+    // TODO: optimise this to use a hash map or similar, alternately parallelize this
     // do a linear search through the vertices and see if any match
     for (int i = 0; i < vertices.size(); i++)
     {
@@ -19,12 +19,12 @@ int FaceIndex::getVertexIndex(Vertex vertex)
     if (index == -1)
     {
         vertices.push_back(vertex);
-        index = vertices.size() - 1;
+        index = (int)vertices.size() - 1;
     }
     return index;
 }
 
-void FaceIndex::readFile(std::string filename)
+void FaceIndex::readFile(const std::string& filename)
 {
     // clear the faces and vertices vectors in case they already contain a mesh
     faces.clear();
@@ -41,7 +41,7 @@ void FaceIndex::readFile(std::string filename)
     fileReader >> numFaces;
     std::cout << "Reading in " << numFaces << " faces from " << filename << std::endl;
     faces.resize(numFaces);
-    Vertex currentVertex;
+    Vertex currentVertex{};
     // read in each face
     for (int faceIndex = 0; faceIndex < numFaces; faceIndex++)
     {
@@ -81,7 +81,7 @@ void FaceIndex::readFile(std::string filename)
     std::cout << "Successfully read in " << numFaces << " faces from " << filename << std::endl;
 }
 
-void FaceIndex::writeFile(std::string filename)
+void FaceIndex::writeFile(const std::string& filename)
 {
     // get the object name to put in the header data, and give easier to read outputs
     std::string objectName = filename;
@@ -121,6 +121,6 @@ void FaceIndex::writeFile(std::string filename)
     }
 
     fileWriter.close();
-    std::cout << "succesfully written the " << objectName << " to a .face file" << std::endl;
+    std::cout << "successfully written the " << objectName << " to a .face file" << std::endl;
 }
 

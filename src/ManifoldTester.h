@@ -35,7 +35,7 @@ private:
     std::vector<Edge> getOneRing(int vertexIndex);
 
     // method to check if a list of edges is a single cycle
-    bool isSingleCycle(std::vector<Edge> edges);
+    static bool isSingleCycle(std::vector<Edge> edges);
 
     float dotProduct(const Cartesian3 &a, const Cartesian3 &b)
     {
