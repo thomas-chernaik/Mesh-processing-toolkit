@@ -22,7 +22,7 @@ void ManifoldTester::testManifold()
     // start a timer
     auto start = std::chrono::high_resolution_clock::now();
 #endif
-    testPinchPoints();
+    //testPinchPoints();
 #ifdef TIMING
     // stop the timer
     auto stop = std::chrono::high_resolution_clock::now();
@@ -136,6 +136,45 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
         Cartesian3 rPrime2 = {dotProduct(r2 - p, u), dotProduct(r2 - p, w), dotProduct(r2 - p, n)};
         Cartesian3 triangle2[3] = {pPrime2, qPrime2, rPrime2};
 
+        // if they share an edge, we will handle this differently, checking for point in triangle
+        int sharedVertices = 0;
+        int verticesShared[2];
+        int verticesShared2[2];
+        for (int v1 = 0; v1 < 3; v1++)
+        {
+            for (int v2 = 0; v2 < 3; v2++)
+            {
+                if (faces[f1][v1] == faces[f2][v2])
+                {
+                    verticesShared[sharedVertices] = v1;
+                    verticesShared2[sharedVertices] = v2;
+                    sharedVertices++;
+                }
+            }
+        }
+        if(sharedVertices >= 2)
+        {
+            // we only need to test that either of the non-shared vertices is in the other triangle
+            for(int i = 0; i < 3; i++)
+            {
+                if (i != verticesShared[0] && i != verticesShared[1])
+                {
+                    if (TriangleContainsVertex(triangle2[0], triangle2[1], triangle2[2], triangle1[i]))
+                    {
+                        return true;
+                    }
+                }
+                if (i != verticesShared2[0] && i != verticesShared2[1])
+                {
+                    if (TriangleContainsVertex(triangle1[0], triangle1[1], triangle1[2], triangle2[i]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         for (int v1 = 0; v1 < 3; v1++)
         {
             for (int v2 = 0; v2 < 3; v2++)
@@ -161,10 +200,12 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
         {
             if (TriangleContainsVertex(triangle2[0], triangle2[1], triangle2[2], triangle1[v1]))
             {
+                std::cout << "Triangle 1 contains triangle 2" << std::endl;
                 return true;
             }
             if (TriangleContainsVertex(triangle1[0], triangle1[1], triangle1[2], triangle2[v1]))
             {
+                std::cout << "Triangle 2 contains triangle 1" << std::endl;
                 return true;
             }
         }

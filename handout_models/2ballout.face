@@ -1,0 +1,36 @@
+# University of Leeds 2024-2025
+# COMP 5893M Assignment 1
+# Thomas Chernaik
+# sc21trc
+#
+# Object Name: 2ballout
+# Vertices=12 Faces=16
+#
+Vertex 0  1  2  4.9314
+Vertex 1  1.9314  2  4
+Vertex 2  1  2.9314  4
+Vertex 3  0.0686  2  4
+Vertex 4  1  1.0686  4
+Vertex 5  1  2  3.0686
+Vertex 6  1  2  2.9314
+Vertex 7  1.9314  2  2
+Vertex 8  1  2.9314  2
+Vertex 9  0.0686  2  2
+Vertex 10  1  1.0686  2
+Vertex 11  1  2  1.0686
+Face 0  0  1  2
+Face 1  0  2  3
+Face 2  4  1  0
+Face 3  2  1  5
+Face 4  0  3  4
+Face 5  2  5  3
+Face 6  5  1  4
+Face 7  3  5  4
+Face 8  6  7  8
+Face 9  6  8  9
+Face 10  10  7  6
+Face 11  8  7  11
+Face 12  6  9  10
+Face 13  8  11  9
+Face 14  11  7  10
+Face 15  9  11  10

@@ -5,7 +5,7 @@ outputFile="manifold_test_results.txt"
 echo "please enter the file path to the built program"
 programPath="../cmake-build-release/manifoldtesting/manifoldtesting"
 # clear the output file
-echo "" > $outputFile
+echo -n "" > $outputFile
 # for each file in the input directory ending in .tri
 for file in $inputDir/*.tri
 do
@@ -29,6 +29,4 @@ do
         echo $line >> $outputFile
       fi
     done <<< "$output"
-    # write a newline to the output file
-    echo "" >> $outputFile
 done
