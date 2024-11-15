@@ -19,6 +19,10 @@ using edge = int;
 class DirectedEdge
 {
 public:
+
+    // constructor with an optional argument to set the readWithErrors flag
+    explicit DirectedEdge(bool readWithErrors = false) : readWithErrors(readWithErrors) {}
+
     // called to read a .face file into the instance
     void readFile(const std::string& filename);
 
@@ -29,6 +33,17 @@ protected:
 
     // called to compute the directed edges from the indexed faces
     void constructDirectedEdges();
+
+    bool readWithErrors = false;
+
+    void error(const std::string& message, int exitCode = -1)
+    {
+        std::cerr << message << std::endl;
+        if (!readWithErrors)
+        {
+            exit(exitCode);
+        }
+    }
 
     std::vector<Vertex> vertices;
     std::vector<Face> faces;

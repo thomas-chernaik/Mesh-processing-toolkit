@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <unordered_set>
+#include <sstream>
 #include "ManifoldTester.h"
 
 void ManifoldTester::testManifold()
@@ -16,25 +18,38 @@ void ManifoldTester::testManifold()
     // There is nothing stopping the mesh from being multiple components, in which case it isn't a manifold mesh, but multiple
 
     // test for pinch points
+#ifdef TIMING
     // start a timer
     auto start = std::chrono::high_resolution_clock::now();
+#endif
     testPinchPoints();
+#ifdef TIMING
     // stop the timer
     auto stop = std::chrono::high_resolution_clock::now();
     // output the time taken
     std::cout << "Pinch points took "
               << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
               << " milliseconds" << std::endl;
-    // test for self intersections
+
     start = std::chrono::high_resolution_clock::now();
+#endif
+    // test for self intersections
     testSelfIntersections();
+#ifdef TIMING
     stop = std::chrono::high_resolution_clock::now();
     std::cout << "Self intersections took "
               << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
               << " milliseconds" << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+#endif
     // test for multiple components
     testMultipleComponents();
-
+#ifdef TIMING
+    stop = std::chrono::high_resolution_clock::now();
+    std::cout << "Multiple components took "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+              << " milliseconds" << std::endl;
+#endif
 }
 
 void ManifoldTester::testPinchPoints()
@@ -81,6 +96,7 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     Cartesian3 face1Normal = VertexToCartesian3(vertices[faces[f1][1]] - vertices[faces[f1][0]]).cross(
             VertexToCartesian3(
                     vertices[faces[f1][2]] - vertices[faces[f1][0]]));
+    face1Normal = face1Normal.normalise();
     float face1D = dotProduct(face1Normal, vertices[faces[f1][0]]);
     // get the 3 signed distances of the second face to the plane of the first face
     float distances1[3];
@@ -88,48 +104,66 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     {
         distances1[v] = dotProduct(face1Normal, vertices[faces[f2][v]]) - face1D;
     }
-    float e = std::numeric_limits<float>::epsilon();
+    float e = std::numeric_limits<float>::epsilon() * 5.0f;
     // if the distances1 are all zero then the faces are coplanar, and we check for intersection separately
     if (std::abs(distances1[0]) < e &&
         std::abs(distances1[1]) < e &&
         std::abs(distances1[2]) < e)
     {
-        // TODO: test 2D
         // project the vertices of the faces onto the plane of the first face
         // if the 2D triangles intersect then the 3D triangles intersect
-        Cartesian3 triangle1[3];
-        Cartesian3 triangle2[3];
-        for (int v = 0; v < 3; v++)
-        {
-            triangle1[v] = VertexToCartesian3(vertices[faces[f1][v]]);
-            triangle2[v] = VertexToCartesian3(vertices[faces[f2][v]]);
-        }
-        // project the vertices onto the plane
-        for (int v = 0; v < 3; v++)
-        {
-            triangle1[v] = triangle1[v] - face1Normal * dotProduct(face1Normal, triangle1[v] - VertexToCartesian3(
-                    vertices[faces[f1][0]]));
-            triangle2[v] = triangle2[v] - face1Normal * dotProduct(face1Normal, triangle2[v] - VertexToCartesian3(
-                    vertices[faces[f1][0]]));
-        }
+        // create basis vectors for the plane from the triangle edges
+        Cartesian3 p = VertexToCartesian3(vertices[faces[f1][0]]);
+        Cartesian3 q = VertexToCartesian3(vertices[faces[f1][1]]);
+        Cartesian3 r = VertexToCartesian3(vertices[faces[f1][2]]);
+        Cartesian3 u = q - p;
+        u = u.normalise();
+        Cartesian3 v = r - p;
+        Cartesian3 n = u.cross(v);
+        n = n.normalise();
+        Cartesian3 w = n.cross(u);
+        w = w.normalise();
+
+        Cartesian3 pPrime = {dotProduct(p - p, u), dotProduct(p - p, w), dotProduct(p - p, n)};
+        Cartesian3 qPrime = {dotProduct(q - p, u), dotProduct(q - p, w), dotProduct(q - p, n)};
+        Cartesian3 rPrime = {dotProduct(r - p, u), dotProduct(r - p, w), dotProduct(r - p, n)};
+        Cartesian3 triangle1[3] = {pPrime, qPrime, rPrime};
+        Cartesian3 p2 = VertexToCartesian3(vertices[faces[f2][0]]);
+        Cartesian3 q2 = VertexToCartesian3(vertices[faces[f2][1]]);
+        Cartesian3 r2 = VertexToCartesian3(vertices[faces[f2][2]]);
+        Cartesian3 pPrime2 = {dotProduct(p2 - p, u), dotProduct(p2 - p, w), dotProduct(p2 - p, n)};
+        Cartesian3 qPrime2 = {dotProduct(q2 - p, u), dotProduct(q2 - p, w), dotProduct(q2 - p, n)};
+        Cartesian3 rPrime2 = {dotProduct(r2 - p, u), dotProduct(r2 - p, w), dotProduct(r2 - p, n)};
+        Cartesian3 triangle2[3] = {pPrime2, qPrime2, rPrime2};
+
         for (int v1 = 0; v1 < 3; v1++)
         {
             for (int v2 = 0; v2 < 3; v2++)
             {
                 if (EdgesIntersect(triangle1[v1], triangle1[(v1 + 1) % 3], triangle2[v2], triangle2[(v2 + 1) % 3]))
                 {
+                    // print out the intersecting edges
+                    std::cout << "Edges (" << vertices[faces[f1][v1]].x << ", " << vertices[faces[f1][v1]].y << ", "
+                              << vertices[faces[f1][v1]].z << ") to ("
+                              << vertices[faces[f1][(v1 + 1) % 3]].x << ", " << vertices[faces[f1][(v1 + 1) % 3]].y << ", "
+                              << vertices[faces[f1][(v1 + 1) % 3]].z << ") and ("
+                              << vertices[faces[f2][v2]].x << ", " << vertices[faces[f2][v2]].y << ", "
+                              << vertices[faces[f2][v2]].z << ") to ("
+                              << vertices[faces[f2][(v2 + 1) % 3]].x << ", " << vertices[faces[f2][(v2 + 1) % 3]].y << ", "
+                              << vertices[faces[f2][(v2 + 1) % 3]].z << ") intersect" << std::endl;
+
                     return true;
                 }
             }
         }
         // if the edges don't intersect than either one triangle contains the other, or they don't intersect
-        for(int v1 = 0; v1 < 3; v1++)
+        for (int v1 = 0; v1 < 3; v1++)
         {
-            if(TriangleContainsVertex(triangle2[0], triangle2[1], triangle2[2], triangle1[v1]))
+            if (TriangleContainsVertex(triangle2[0], triangle2[1], triangle2[2], triangle1[v1]))
             {
                 return true;
             }
-            if(TriangleContainsVertex(triangle1[0], triangle1[1], triangle1[2], triangle2[v1]))
+            if (TriangleContainsVertex(triangle1[0], triangle1[1], triangle1[2], triangle2[v1]))
             {
                 return true;
             }
@@ -257,7 +291,7 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
         std::swap(f2t1, f2t2);
     }
     // see if the intervals overlap (f1t1 is inside f2t or f2t1 is inside f1t)
-    if ((f1t1 > f2t1 && f1t1 < f2t2) || (f2t1 > f1t1 && f2t1 < f1t2))
+    if ((f1t1 > f2t1 + e && f1t1 < f2t2 - e) || (f2t1 > f1t1 + e && f2t1 < f1t2 - e))
     {
         return true;
     }
@@ -268,16 +302,53 @@ void ManifoldTester::testMultipleComponents()
 {
     // we have one component if we can reach every vertex from every other vertex i.e. the graph is connected
     // we can do this by traversing the graph from one starting vertex and seeing if we can reach every other vertex
+    // create a vector of visited vertices, with false for unvisited and true for visited
     std::vector<bool> visited(vertices.size(), false);
 
-    // TODO: traverse the graph
+    int numComponents = 0;
 
-
-    // if any vertex is still unvisited then we have multiple components
-    if (std::any_of(visited.begin(), visited.end(), [](bool v)
+    while(std::any_of(visited.begin(), visited.end(), [](bool v)
     { return !v; }))
     {
-        std::cout << "Mesh has multiple components, but each component is manifold" << std::endl;
+        numComponents++;
+        // create a stack of vertices to visit
+        components.emplace_back();
+        std::vector<int> toVisit;
+        // add the first unvisited vertex to the stack
+        toVisit.push_back(std::find(visited.begin(), visited.end(), false) - visited.begin());
+        // while there are still vertices to visit
+        while (!toVisit.empty())
+        {
+            // pop the last vertex from the stack
+            int currentVertex = toVisit.back();
+            toVisit.pop_back();
+            // if we have already visited this vertex then skip it
+            if (visited[currentVertex])
+            {
+                continue;
+            }
+            // add the vertex to the component
+            components[numComponents - 1].push_back(currentVertex);
+            // mark the vertex as visited
+            visited[currentVertex] = true;
+            // get the one ring of the vertex
+            std::vector<int> oneRing = getOneRingVertices(currentVertex);
+            // for each vertex in the one ring
+            for (int v: oneRing)
+            {
+                // if the vertex hasn't been visited then add it to the stack
+                if (!visited[v])
+                {
+                    toVisit.push_back(v);
+                }
+            }
+        }
+
+    }
+    // if there is more than one component then output a warning
+    if (numComponents > 1)
+    {
+        std::cerr << "Mesh has " << numComponents << " components" << std::endl;
     }
 }
 
@@ -337,23 +408,280 @@ bool ManifoldTester::isSingleCycle(std::vector<Edge> edges)
 
 bool ManifoldTester::EdgesIntersect(Cartesian3 v1, Cartesian3 v2, Cartesian3 v3, Cartesian3 v4)
 {
-    //TODO: implement segment segment intersection
-return false;
+    // check if the two line segments share a point
+    if (v1 == v3 || v1 == v4 || v2 == v3 || v2 == v4)
+    {
+        return false;
+    }
+    // calculate the direction vectors of the two line segments
+    Cartesian3 direction1 = v2 - v1;
+    Cartesian3 direction2 = v4 - v3;
+
+    // calculate the denominator of the t values
+    float denominator = 1.f / (direction1.x * direction2.y - direction1.y * direction2.x);
+    // if the denominator is zero then the lines are parallel
+    if (std::abs(denominator) < std::numeric_limits<float>::epsilon() * 5.0f)
+    {
+        return false;
+    }
+
+    // calculate the numerators
+    Cartesian3 u = v1 - v3;
+    float numerator1 = u.x * direction2.y - u.y * direction2.x;
+    float numerator2 = u.x * direction1.y - u.y * direction1.x;
+
+    float t1 = numerator1 * denominator;
+    float t2 = numerator2 * denominator;
+
+    float e = std::numeric_limits<float>::epsilon() * 5.0f;
+    // if the t values are between 0 and 1 then the line segments intersect
+    return t1 > e && t1 < 1 - e && t2 > e && t2 < 1 - e;
+
 }
 
-bool ManifoldTester::TriangleContainsVertex(const Cartesian3 &v1, const Cartesian3 &v2, const Cartesian3 &v3,
-                                            const Cartesian3 &point)
+// takes a triangle in 2D and a point in 2D and returns if the point is inside the triangle
+// Cartesian3s are used but the z component is ignored
+bool ManifoldTester::TriangleContainsVertex(Cartesian3 &p, Cartesian3 &q, Cartesian3 &r,
+                                            Cartesian3 &point)
 {
-    // TODO: implement point in triangle test
+    // do the half plane test
+    Cartesian3 pr = r - p;
+    Cartesian3 rq = q - r;
+    Cartesian3 qp = p - q;
+    Cartesian3 pPoint = point - p;
+    Cartesian3 qPoint = point - q;
+    Cartesian3 rPoint = point - r;
+    // find the normals of the lines
+    Cartesian3 prNormal = Cartesian3(-pr.y, pr.x, 0);
+    Cartesian3 rqNormal = Cartesian3(-rq.y, rq.x, 0);
+    Cartesian3 qpNormal = Cartesian3(-qp.y, qp.x, 0);
+
+    float epsilon = -std::numeric_limits<float>::epsilon() * 5.0f;
+
+    if(dotProduct(prNormal, pPoint) >= epsilon && dotProduct(rqNormal, rPoint) >= epsilon && dotProduct(qpNormal, qPoint) >= epsilon)
+    {
+        return true;
+    }
     return false;
 }
 
-int ManifoldTester::CalculateGenus()
+std::vector<int> ManifoldTester::CalculateGenus()
 {
     // in any orientable mesh/polyhedron, the Euler characteristic is given by V - E + F = 2 - 2g
     // therefore, g = (2 - V + E - F) / 2
     // V can be found as the vertices.size()
     // E can be found as the size of otherHalf divided by 2
     // F can be found as the faces.size()
-    return (2 - vertices.size() + otherHalf.size() / 2 - faces.size()) / 2;
+
+    // we will calculate the genus separately for each component
+    std::vector<int> genuses(components.size());
+    int currentComponent = 0;
+    for (auto &component: components)
+    {
+        // the number of vertices in this component is the size
+        int verticesInComponent = (int)component.size();
+        // count the number of faces in this component
+        std::unordered_set<int> facesInComponent;
+        for (int v: component)
+        {
+            for (int i = 0; i < faces.size(); i++)
+            {
+                if (faces[i][0] == v || faces[i][1] == v || faces[i][2] == v)
+                {
+                    facesInComponent.insert(i);
+                }
+            }
+        }
+        int iFacesInComponent = (int)facesInComponent.size();
+        // the number of edges is the number of faces * 3 / 2
+        int edgesInComponent = iFacesInComponent * 3 / 2;
+        int genusesInComponent = (2 - verticesInComponent + edgesInComponent - iFacesInComponent) / 2;
+        genuses[currentComponent++] = genusesInComponent;
+    }
+    return genuses;
+}
+
+std::vector<int> ManifoldTester::getOneRingVertices(int vertexIndex)
+{
+    std::vector<int> oneRingVertices;
+
+    // get the one ring of the vertex
+    for (auto &face:faces)
+    {
+        for (int v = 0; v < 3; v++)
+        {
+            if (face[v] == vertexIndex)
+            {
+                oneRingVertices.push_back(face[(v + 1) % 3]);
+                oneRingVertices.push_back(face[(v + 2) % 3]);
+            }
+        }
+    }
+    return oneRingVertices;
+}
+
+void ManifoldTester::readFileDiredge(const std::string &filename)
+{
+    // clear the vertices, faces, directedEdges and otherHalf vectors
+    vertices.clear();
+    faces.clear();
+    directedEdges.clear();
+    otherHalf.clear();
+    // open the file to read
+    std::ifstream fileReader(filename);
+    // check the file opened
+    if (!fileReader.is_open())
+    {
+        std::cerr << "File failed to open" << std::endl;
+        exit(-2);
+    }
+    // read out the comments - these are lines that start with a #
+    std::string line;
+    while (std::getline(fileReader, line))
+    {
+        if (line[0] != '#')
+        {
+            break;
+        }
+    }
+    int currentIndex;
+    // we are reading vertices while the line's first word is Vertex
+    while (line.substr(0, 6) == "Vertex")
+    {
+        // create a new vertex
+        Vertex vertex{};
+        // split up the line by whitespace
+        // [0] = "Vertex", [1] = index, [2] = x, [3] = y, [4] = z
+        std::istringstream lineStream(line);
+        lineStream >> line; // "Vertex"
+        lineStream >> currentIndex;
+        lineStream >> vertex.x;
+        lineStream >> vertex.y;
+        lineStream >> vertex.z;
+        // resize the vertices to be the maximum of the currentIndex + 1 or the current size, with a default value of null vertex
+        vertices.resize(std::max(currentIndex + 1, (int) vertices.size()), nullVertex);
+        // add the vertex to the list
+        vertices[currentIndex] = vertex;
+        // read the next line
+        std::getline(fileReader, line);
+    }
+    // check we don't have any null vertices remaining
+    for (Vertex vertex: vertices)
+    {
+        if (vertex == nullVertex)
+        {
+            std::cerr << "File is missing vertices" << std::endl;
+            exit(-3);
+        }
+    }
+    // we are now reading first directed edges while the line's first word is FirstDirectedEdge
+    while (line.substr(0, 17) == "FirstDirectedEdge")
+    {
+        int thisEdge;
+        // split up the line by whitespace
+        // [0] = "FirstDirectedEdge", [1] = index, [2] = edge index
+        std::istringstream lineStream(line);
+        lineStream >> line; // "FirstDirectedEdge"
+        lineStream >> currentIndex;
+        lineStream >> thisEdge;
+        // resize the directedEdges to be the maximum of the currentIndex + 1 or the current size, with a default value of -1
+        directedEdges.resize(std::max(currentIndex + 1, (int) directedEdges.size()), -1);
+        // add the edge to the list
+        directedEdges[currentIndex] = thisEdge;
+        // read the next line
+        std::getline(fileReader, line);
+    }
+    // check we don't have any null directed edges remaining
+    for (int edge: directedEdges)
+    {
+        if (edge == -1)
+        {
+            std::cerr << "File is missing directed edges" << std::endl;
+            exit(-3);
+        }
+    }
+    // check we have as many directed edges as we have vertices
+    if (directedEdges.size() != vertices.size())
+    {
+        std::cerr << "File has the wrong number of directed edges" << std::endl;
+        exit(-3);
+    }
+    // now we read the faces
+    // we are reading faces while the line's first word is Face
+    while (line.substr(0, 4) == "Face")
+    {
+        // create a new face
+        Face face{};
+        // split up the line by whitespace
+        // [0] = "Face", [1] = index, [2] = vertex1, [3] = vertex2, [4] = vertex3
+        std::istringstream lineStream(line);
+        lineStream >> line; // "Face"
+        lineStream >> currentIndex;
+        lineStream >> face[0];
+        lineStream >> face[1];
+        lineStream >> face[2];
+        // check that the face indices are valid
+        if (face[0] < 0 || face[0] > vertices.size() || face[1] < 0 || face[1] > vertices.size() || face[2] < 0 ||
+            face[2] > vertices.size())
+        {
+            std::cerr << "Face " << currentIndex << " has an invalid vertex index" << std::endl;
+            exit(-3);
+        }
+        // resize the faces to be the maximum of the currentIndex + 1 or the current size, with a default value of null face
+        faces.resize(std::max(currentIndex + 1, (int) faces.size()), nullFace);
+        // add the face to the list
+        faces[currentIndex] = face;
+        // read the next line
+        std::getline(fileReader, line);
+    }
+    // check we don't have any null faces remaining
+    for (Face face: faces)
+    {
+        if (face == nullFace)
+        {
+            std::cerr << "File is missing faces" << std::endl;
+            exit(-3);
+        }
+    }
+    // now we read the other halfs
+    // we are reading other halfs while the line's first word is OtherHalf
+    while (line.substr(0, 9) == "OtherHalf")
+    {
+        int thisHalf;
+        // split up the line by whitespace
+        // [0] = "OtherHalf", [1] = index, [2] = half index
+        std::istringstream lineStream(line);
+        lineStream >> line; // "OtherHalf"
+        lineStream >> currentIndex;
+        lineStream >> thisHalf;
+        // resize the otherHalf to be the maximum of the currentIndex + 1 or the current size, with a default value of -2 - a -1 value means no other half but is valid
+        otherHalf.resize(std::max(currentIndex + 1, (int) otherHalf.size()), -2);
+        // add the half to the list
+        otherHalf[currentIndex] = thisHalf;
+        // read the next line
+        std::getline(fileReader, line);
+    }
+    // check we don't have any null other halfs remaining
+    for (int half: otherHalf)
+    {
+        if (half == -2)
+        {
+            std::cerr << "File is missing other halfs" << std::endl;
+            exit(-3);
+        }
+    }
+    // check we don't have anything else left but white space
+    char whiteSpaceCheckerChar;
+    while (fileReader.get(whiteSpaceCheckerChar))
+    {
+        if (!isspace(whiteSpaceCheckerChar))
+        {
+            std::cerr << "Finished reading the file but there are still non-whitespace characters left" << std::endl;
+            exit(-3);
+        }
+    }
+    // close the file
+    fileReader.close();
+
+
 }

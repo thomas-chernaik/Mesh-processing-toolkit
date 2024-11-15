@@ -38,14 +38,7 @@ int main(int argc, char **argv)
 
     // create a manifold tester and test the mesh
     ManifoldTester mt;
-    // if the file is a .diredge file then we read it in as such
-    if (filename.size() > 8 && filename.substr(filename.size() - 8) == ".diredge")
-    {
-        mt.readFileDiredge(filename);
-    } else
-    {
-        mt.readFile(filename);
-    }
+    mt.readFile(filename);
     mt.testManifold();
 
     // if the program hasn't exited then the mesh is manifold

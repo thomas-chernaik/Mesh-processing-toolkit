@@ -102,7 +102,7 @@ void DirectedEdge::readFile(const std::string& filename)
     {
         if (!isspace(whiteSpaceCheckerChar))
         {
-            std::cerr << "File contains more than just faces and vertices" << std::endl;
+            std::cerr << "Finished reading the file but there are still non-whitespace characters left" << std::endl;
             exit(-3);
         }
     }
@@ -156,8 +156,7 @@ void DirectedEdge::constructDirectedEdges()
         // if we didn't find a directed edge then we don't have a manifold mesh
         if (directedEdges[i] == -1)
         {
-            std::cerr << "Mesh is not manifold as vertex " << i << " is not in any face" << std::endl;
-            exit(-4);
+            error("Mesh is not manifold as vertex " + std::to_string(i) + " is not in any face", -4);
         }
     }
     // stop the timer
@@ -191,8 +190,7 @@ void DirectedEdge::constructDirectedEdges()
                 // if there is already another half then we don't have a manifold mesh
                 if (otherHalf[e] != -1)
                 {
-                    std::cerr << "Mesh is not manifold as edge " << e << " has multiple other halves" << std::endl;
-                    exit(-4);
+                    error("Mesh is not manifold as edge " + std::to_string(e) + " has multiple other halves", -4);
                 }
                 // set the other half to be the edge index
                 otherHalf[e] = e2;
@@ -203,8 +201,7 @@ void DirectedEdge::constructDirectedEdges()
         // if we didn't find another half then we don't have a manifold mesh
         if (otherHalf[e] == -1)
         {
-            std::cerr << "Mesh is not manifold as edge " << e << " has no other half" << std::endl;
-            exit(-4);
+            error("Mesh is not manifold as edge " + std::to_string(e) + " has no other half", -4);
         }
     }
     // stop the timer

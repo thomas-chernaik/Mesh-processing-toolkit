@@ -14,12 +14,28 @@
 class ManifoldTester : public DirectedEdge
 {
 public:
+    // constructor with readwitherrors as false
+    explicit ManifoldTester(bool readWithErrors = false) : DirectedEdge(readWithErrors)
+    {}
+
     // method to test if the mesh is manifold
     void testManifold();
 
     // method to calculate the genus of the mesh using the euler formula
-    int CalculateGenus();
+    std::vector<int> CalculateGenus();
 
+    // a method to read in a .diredge file
+    void readFileDiredge(const std::string &filename);
+
+protected:
+    // method to test if the mesh contains multiple components
+    void testMultipleComponents();
+
+    // method to get the one ring (as a list of edge indices) of a vertex
+    std::vector<Edge> getOneRing(int vertexIndex);
+
+    // method to get the one ring (as a list of vertex indices) of a vertex
+    std::vector<int> getOneRingVertices(int vertexIndex);
 
 private:
     // method to test if the mesh has any pinch points
@@ -31,11 +47,6 @@ private:
     // method to test the intersection of two triangles
     bool testTriangleIntersection(int f1, int f2);
 
-    // method to test if the mesh contains multiple components
-    void testMultipleComponents();
-
-    // method to get the one ring (as a list of edge indices) of a vertex
-    std::vector<Edge> getOneRing(int vertexIndex);
 
     // method to check if a list of edges is a single cycle
     static bool isSingleCycle(std::vector<Edge> edges);
@@ -59,11 +70,14 @@ private:
     }
 
     // returns if two line segments intersect
-    inline bool EdgesIntersect(Cartesian3 v1, Cartesian3 v2, Cartesian3 v3, Cartesian3 v4);
+    static inline bool EdgesIntersect(Cartesian3 v1, Cartesian3 v2, Cartesian3 v3, Cartesian3 v4);
 
     // returns if a point is inside a triangle
-    inline bool
-    TriangleContainsVertex(const Cartesian3 &v1, const Cartesian3 &v2, const Cartesian3 &v3, const Cartesian3 &point);
+    static inline bool
+    TriangleContainsVertex(Cartesian3 &p, Cartesian3 &q, Cartesian3 &r, Cartesian3 &point);
+
+    // contains the face indexes of each component
+    std::vector<std::vector<int>> components;
 
 };
 
