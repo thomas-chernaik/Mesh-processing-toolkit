@@ -188,14 +188,19 @@ void DirectedEdge::constructDirectedEdges()
             if (faces[e2 / 3][e2 % 3] == vEnd && faces[e2 / 3][(e2 + 1) % 3] == vStart)
             {
                 // if there is already another half then we don't have a manifold mesh
-                if (otherHalf[e] != -1)
+                if (otherHalf[e] != -1 || otherHalf[e2] != -1)
                 {
                     error("Mesh is not manifold as edge " + std::to_string(e) + " has multiple other halves", -4);
                 }
                 // set the other half to be the edge index
                 otherHalf[e] = e2;
                 otherHalf[e2] = e;
-                break;
+                //break;
+            }
+            // if the edge is the same as the first edge then we don't have a manifold mesh
+            if (faces[e2 / 3][e2 % 3] == vStart && faces[e2 / 3][(e2 + 1) % 3] == vEnd)
+            {
+                error("Mesh is not manifold as edge " + std::to_string(e) + " exists on multiple faces", -4);
             }
         }
         // if we didn't find another half then we don't have a manifold mesh

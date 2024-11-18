@@ -37,8 +37,7 @@ private:
 
     // method to choose the smallest angled edge from a set of edges
     Edge chooseSmallestAngledEdge(std::vector<Edge> edges, Edge currentEdge);
-    // method to get the angle between two edges
-    float getAngleBetweenEdges(Edge edge1, Edge edge2);
+
     // method to fill a hole in the mesh by adding a point at the center of gravity of the boundary and connecting it to all the vertices in the boundary
     void fillHole(std::vector<Edge> boundary);
 
@@ -51,7 +50,9 @@ private:
     void removeItems(std::vector<Edge>& vector1, const std::vector<Edge>& vector2);
 
 
-
+protected:
+// method to get the angle between two edges
+float getAngleBetweenEdges(Edge edge1, Edge edge2);
 };
 
 

@@ -46,6 +46,8 @@ void MeshRepair::repairMesh()
             }
         }
         std::cout << "Number of unpaired edges: " << numUnpairedEdges << std::endl;
+        if(numUnpairedEdges == 1)
+            break;
     }
 }
 
