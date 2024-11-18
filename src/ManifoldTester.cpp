@@ -100,9 +100,8 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
 {
     // calculate the plane for each face
     // an early out is after the first plane calculation if the second face is on the same side of the plane
-    Cartesian3 face1Normal = VertexToCartesian3(vertices[faces[f1][1]] - vertices[faces[f1][0]]).cross(
-            VertexToCartesian3(
-                    vertices[faces[f1][2]] - vertices[faces[f1][0]]));
+    Cartesian3 face1Normal = (vertices[faces[f1][1]] - vertices[faces[f1][0]]).cross(
+            (vertices[faces[f1][2]] - vertices[faces[f1][0]]));
     face1Normal = face1Normal.normalise();
     float face1D = dotProduct(face1Normal, vertices[faces[f1][0]]);
     // get the 3 signed distances of the second face to the plane of the first face
@@ -245,9 +244,8 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     }
 
     // calculate the plane for the second face
-    Cartesian3 face2Normal = VertexToCartesian3(vertices[faces[f2][1]] - vertices[faces[f2][0]]).cross(
-            VertexToCartesian3(
-                    vertices[faces[f2][2]] - vertices[faces[f2][0]]));
+    Cartesian3 face2Normal = (vertices[faces[f2][1]] - vertices[faces[f2][0]]).cross(
+            (vertices[faces[f2][2]] - vertices[faces[f2][0]]));
     float face2D = dotProduct(face2Normal, vertices[faces[f2][0]]);
     // get the 3 signed distances of the first face to the plane of the second face
     float distances2[3];
@@ -376,6 +374,7 @@ void ManifoldTester::testMultipleComponents()
     std::vector<bool> visited(vertices.size(), false);
 
     int numComponents = 0;
+    components.clear();
 
     while (std::any_of(visited.begin(), visited.end(), [](bool v)
     { return !v; }))

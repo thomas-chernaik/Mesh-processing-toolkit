@@ -38,9 +38,9 @@ protected:
 
     void error(const std::string& message, int exitCode = -1)
     {
-        std::cerr << message << std::endl;
         if (!readWithErrors)
         {
+            std::cerr << message << std::endl;
             exit(exitCode);
         }
     }

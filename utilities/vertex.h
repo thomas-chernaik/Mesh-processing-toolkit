@@ -8,6 +8,7 @@
 #include <limits>
 #include <cmath>
 #include <ostream>
+#include "../triangle_renderer/Cartesian3.h"
 // stores the data in a vertex (the 3D coordinate it exists at)
 
 struct Vertex
@@ -23,7 +24,7 @@ struct Vertex
         return std::abs(x - other.x) < epsilon && std::abs(y - other.y) < epsilon && std::abs(z - other.z) < epsilon;
     }
 
-    Vertex operator-(const Vertex &other) const
+    Cartesian3 operator-(const Vertex &other)
     {
         return {x - other.x, y - other.y, z - other.z};
     }
@@ -37,6 +38,11 @@ struct Vertex
     {
         os << "(" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")";
         return os;
+    }
+
+    Vertex operator/(float factor) const
+    {
+        return {x / factor, y / factor, z / factor};
     }
 
 };

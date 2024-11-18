@@ -41,6 +41,12 @@ protected:
     // method to get the one ring (as a list of vertex indices) of a vertex
     std::vector<int> getOneRingVertices(int vertexIndex);
 
+// returns the dot product of two Cartesian3 vectors
+static float dotProduct(const Cartesian3 &a, const Cartesian3 &b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
 private:
     // method to test if the mesh has any pinch points
     void testPinchPoints();
@@ -54,12 +60,6 @@ private:
 
     // method to check if a list of edges is a single cycle
     static bool isSingleCycle(std::vector<Edge> edges);
-
-    // returns the dot product of two Cartesian3 vectors
-    static float dotProduct(const Cartesian3 &a, const Cartesian3 &b)
-    {
-        return a.x * b.x + a.y * b.y + a.z * b.z;
-    }
 
     // returns the dot product of a Cartesian3 vector and a Vertex data type
     static float dotProduct(const Cartesian3 &a, const Vertex &b)
