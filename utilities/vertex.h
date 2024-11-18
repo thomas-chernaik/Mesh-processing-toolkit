@@ -7,6 +7,7 @@
 
 #include <limits>
 #include <cmath>
+#include <ostream>
 // stores the data in a vertex (the 3D coordinate it exists at)
 
 struct Vertex
@@ -29,6 +30,13 @@ struct Vertex
     Vertex operator+(const Vertex &other) const
     {
         return {x + other.x, y + other.y, z + other.z};
+    }
+
+    // operator to print out the vertex
+    friend std::ostream &operator<<(std::ostream &os, const Vertex &vertex)
+    {
+        os << "(" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")";
+        return os;
     }
 
 };

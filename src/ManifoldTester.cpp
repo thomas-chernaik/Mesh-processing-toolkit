@@ -22,7 +22,7 @@ void ManifoldTester::testManifold()
     // start a timer
     auto start = std::chrono::high_resolution_clock::now();
 #endif
-    //testPinchPoints();
+    testPinchPoints();
 #ifdef TIMING
     // stop the timer
     auto stop = std::chrono::high_resolution_clock::now();
@@ -83,6 +83,13 @@ void ManifoldTester::testSelfIntersections()
             {
                 // output the edges and vertices of the intersecting faces
                 std::cerr << "Mesh is not manifold as faces " << f1 << " and " << f2 << " intersect" << std::endl;
+#ifndef DEBUG
+                // output the vertices of the faces
+                std::cerr << "Face " << f1 << " vertices: " << vertices[faces[f1][0]] << " " << vertices[faces[f1][1]]
+                          << " " << vertices[faces[f1][2]] << std::endl;
+                std::cerr << "Face " << f2 << " vertices: " << vertices[faces[f2][0]] << " " << vertices[faces[f2][1]]
+                          << " " << vertices[faces[f2][2]] << std::endl;
+#endif
                 exit(-4);
             }
         }
@@ -104,7 +111,7 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     {
         distances1[v] = dotProduct(face1Normal, vertices[faces[f2][v]]) - face1D;
     }
-    float e = std::numeric_limits<float>::epsilon() * 5.0f;
+    float e = 1e-5;
     // if the distances1 are all zero then the faces are coplanar, and we check for intersection separately
     if (std::abs(distances1[0]) < e &&
         std::abs(distances1[1]) < e &&
@@ -152,10 +159,10 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
                 }
             }
         }
-        if(sharedVertices >= 2)
+        if (sharedVertices >= 2)
         {
             // we only need to test that either of the non-shared vertices is in the other triangle
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 if (i != verticesShared[0] && i != verticesShared[1])
                 {
@@ -184,11 +191,13 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
                     // print out the intersecting edges
                     std::cout << "Edges (" << vertices[faces[f1][v1]].x << ", " << vertices[faces[f1][v1]].y << ", "
                               << vertices[faces[f1][v1]].z << ") to ("
-                              << vertices[faces[f1][(v1 + 1) % 3]].x << ", " << vertices[faces[f1][(v1 + 1) % 3]].y << ", "
+                              << vertices[faces[f1][(v1 + 1) % 3]].x << ", " << vertices[faces[f1][(v1 + 1) % 3]].y
+                              << ", "
                               << vertices[faces[f1][(v1 + 1) % 3]].z << ") and ("
                               << vertices[faces[f2][v2]].x << ", " << vertices[faces[f2][v2]].y << ", "
                               << vertices[faces[f2][v2]].z << ") to ("
-                              << vertices[faces[f2][(v2 + 1) % 3]].x << ", " << vertices[faces[f2][(v2 + 1) % 3]].y << ", "
+                              << vertices[faces[f2][(v2 + 1) % 3]].x << ", " << vertices[faces[f2][(v2 + 1) % 3]].y
+                              << ", "
                               << vertices[faces[f2][(v2 + 1) % 3]].z << ") intersect" << std::endl;
 
                     return true;
@@ -284,30 +293,50 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     float face1Projected[3];
     float face2Projected[3];
 
-    // using equation 6 from https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf to project the vertices onto the intersection line
-    if (std::abs(intersectionLine.x) == maxComponent)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            face1Projected[i] = vertices[faces[f1][i]].x;
-            face2Projected[i] = vertices[faces[f2][i]].x;
-        }
-    } else if (std::abs(intersectionLine.y) == maxComponent)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            face1Projected[i] = vertices[faces[f1][i]].y;
-            face2Projected[i] = vertices[faces[f2][i]].y;
-        }
-    } else
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            face1Projected[i] = vertices[faces[f1][i]].z;
-            face2Projected[i] = vertices[faces[f2][i]].z;
-        }
-    }
+//    // using equation 6 from https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf to project the vertices onto the intersection line
+//    if (std::abs(intersectionLine.x) == maxComponent)
+//    {
+//        for (int i = 0; i < 3; i++)
+//        {
+//            face1Projected[i] = vertices[faces[f1][i]].x;
+//            face2Projected[i] = vertices[faces[f2][i]].x;
+//        }
+//    } else if (std::abs(intersectionLine.y) == maxComponent)
+//    {
+//        for (int i = 0; i < 3; i++)
+//        {
+//            face1Projected[i] = vertices[faces[f1][i]].y;
+//            face2Projected[i] = vertices[faces[f2][i]].y;
+//        }
+//    } else
+//    {
+//        for (int i = 0; i < 3; i++)
+//        {
+//            face1Projected[i] = vertices[faces[f1][i]].z;
+//            face2Projected[i] = vertices[faces[f2][i]].z;
+//        }
+//    }
 
+
+    // using equation 3 from https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf to project the vertices onto the intersection line
+    // get O, a point on the intersection line
+    Cartesian3 O = {0, 0, 0};
+    // o = p1 + d * ((p1 - p2) dot n2) / (d dot n2)
+    Cartesian3 p1 = VertexToCartesian3(vertices[faces[f1][0]]);
+    Cartesian3 p2 = VertexToCartesian3(vertices[faces[f2][0]]);
+    Cartesian3 d = intersectionLine;
+    Cartesian3 n2 = face2Normal;
+    O = p1 + d * dotProduct(p1 - p2, n2) / dotProduct(d, n2);
+    // project the vertices of the first face onto the intersection line
+    for (int i = 0; i < 3; i++)
+    {
+        face1Projected[i] = dotProduct(intersectionLine, VertexToCartesian3(vertices[faces[f1][i]]) - O);
+    }
+    // project the vertices of the second face onto the intersection line
+    for (int i = 0; i < 3; i++)
+    {
+        face2Projected[i] = dotProduct(intersectionLine, VertexToCartesian3(vertices[faces[f2][i]]) - O);
+    }
     // calculate the t values for the intersection line
     float f1t1, f1t2, f2t1, f2t2;
     f1t1 = face1Projected[oddVertex1] +
@@ -348,7 +377,7 @@ void ManifoldTester::testMultipleComponents()
 
     int numComponents = 0;
 
-    while(std::any_of(visited.begin(), visited.end(), [](bool v)
+    while (std::any_of(visited.begin(), visited.end(), [](bool v)
     { return !v; }))
     {
         numComponents++;
@@ -499,7 +528,8 @@ bool ManifoldTester::TriangleContainsVertex(Cartesian3 &p, Cartesian3 &q, Cartes
 
     float epsilon = -std::numeric_limits<float>::epsilon() * 5.0f;
 
-    if(dotProduct(prNormal, pPoint) >= epsilon && dotProduct(rqNormal, rPoint) >= epsilon && dotProduct(qpNormal, qPoint) >= epsilon)
+    if (dotProduct(prNormal, pPoint) >= epsilon && dotProduct(rqNormal, rPoint) >= epsilon &&
+        dotProduct(qpNormal, qPoint) >= epsilon)
     {
         return true;
     }
@@ -520,7 +550,7 @@ std::vector<int> ManifoldTester::CalculateGenus()
     for (auto &component: components)
     {
         // the number of vertices in this component is the size
-        int verticesInComponent = (int)component.size();
+        int verticesInComponent = (int) component.size();
         // count the number of faces in this component
         std::unordered_set<int> facesInComponent;
         for (int v: component)
@@ -533,7 +563,7 @@ std::vector<int> ManifoldTester::CalculateGenus()
                 }
             }
         }
-        int iFacesInComponent = (int)facesInComponent.size();
+        int iFacesInComponent = (int) facesInComponent.size();
         // the number of edges is the number of faces * 3 / 2
         int edgesInComponent = iFacesInComponent * 3 / 2;
         int genusesInComponent = (2 - verticesInComponent + edgesInComponent - iFacesInComponent) / 2;
@@ -547,7 +577,7 @@ std::vector<int> ManifoldTester::getOneRingVertices(int vertexIndex)
     std::vector<int> oneRingVertices;
 
     // get the one ring of the vertex
-    for (auto &face:faces)
+    for (auto &face: faces)
     {
         for (int v = 0; v < 3; v++)
         {

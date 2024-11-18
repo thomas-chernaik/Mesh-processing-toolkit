@@ -27,9 +27,14 @@ public:
 
 
 private:
+    // method to return the first unpaired edge
     int findLooseEdge();
+    // method to walk around an unpaired set of edges and return the boundary
     std::vector<edge> walkAroundEdge(int edgeIndex);
+    // method to fill a hole in the mesh by adding a point at the center of gravity of the boundary and connecting it to all the vertices in the boundary
     void fillHole(std::vector<edge> boundary);
+
+    void removeAllButLargestComponent();
 
 
 

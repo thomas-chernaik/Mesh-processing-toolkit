@@ -31,6 +31,10 @@ protected:
     // method to test if the mesh contains multiple components
     void testMultipleComponents();
 
+
+    // contains the vertex indices of each component
+    std::vector<std::vector<int>> components;
+
     // method to get the one ring (as a list of edge indices) of a vertex
     std::vector<Edge> getOneRing(int vertexIndex);
 
@@ -76,8 +80,6 @@ private:
     static inline bool
     TriangleContainsVertex(Cartesian3 &p, Cartesian3 &q, Cartesian3 &r, Cartesian3 &point);
 
-    // contains the face indexes of each component
-    std::vector<std::vector<int>> components;
 
 };
 

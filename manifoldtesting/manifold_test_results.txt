@@ -1,18 +1,26 @@
-
-2torus.tri Mesh is not manifold as faces 24 and 37 intersect
-5bout.tri Mesh is not manifold as faces 34 and 85 intersect
+2ballout.tri Genus: 0
+2torus.tri Genus: 2
+5bout.tri Mesh is not manifold as faces 41 and 57 intersect
 747.tri Mesh is not manifold as edge 30 has no other half
 biplane.tri Mesh is not manifold as edge 123 has no other half
-bitorus.tri Mesh is not manifold as faces 46 and 49 intersect
+bitorus.tri Genus: 2
 cherrytree.tri Mesh is not manifold as edge 1 has no other half
 cow.tri Mesh is not manifold as edge 230 has no other half
-dodecahedron.tri Mesh is not manifold as faces 10 and 12 intersect
+cube.tri Genus: 0
+dodecahedron.tri Genus: 0
 fuelinject.tri Mesh is not manifold as edge 1429 has no other half
 Hamish.tri Mesh is not manifold as edge 551 has no other half
-horse.tri Mesh is not manifold as faces 13 and 24 intersect
+hexahedron.tri Genus: 0
+horse.tri Mesh is not manifold as faces 9 and 53 intersect
+icosahedron.tri Genus: 0
 legoman.tri Mesh is not manifold as edge 147 has no other half
-quadtorus.tri Mesh is not manifold as faces 11 and 16 intersect
+many.tri Genus: 0
+octahedron.tri Genus: 0
+quadtorus.tri Genus: 4
 skeleton.tri Mesh is not manifold as edge 1053 has no other half
 tetrahedron_bad.tri Mesh is not manifold as edge 0 has no other half
-tritorus.tri Mesh is not manifold as faces 24 and 38 intersect
+tetrahedronpinch.tri Mesh is not manifold as vertex 0 has a pinch point
+tetrahedron.tri Genus: 0
+torus.tri Genus: 1
+tritorus.tri Genus: 3
 yoda.tri Mesh is not manifold as edge 0 has no other half
