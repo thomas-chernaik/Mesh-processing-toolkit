@@ -18,10 +18,10 @@ public:
     void repairMesh();
 
     // method to write the repaired mesh to a .tri file
-    void writeRepairedMeshTri(const std::string& filename);
+    void writeRepairedMeshTri(const std::string &filename);
 
     // method to write the repaired mesh to a .face file
-    void writeRepairedMeshFace(const std::string& filename);
+    void writeRepairedMeshFace(const std::string &filename);
 
     // it will write to a .diredge file in the default inherited writeFile method
 
@@ -29,6 +29,7 @@ public:
 private:
     // method to return the first unpaired edge
     int findLooseEdge();
+
     // method to walk around an unpaired set of edges and return the boundary as a set of edges
     std::vector<Edge> walkAroundEdge(int edgeIndex);
 
@@ -39,20 +40,35 @@ private:
     Edge chooseSmallestAngledEdge(std::vector<Edge> edges, Edge currentEdge);
 
     // method to fill a hole in the mesh by adding a point at the center of gravity of the boundary and connecting it to all the vertices in the boundary
-    void fillHole(std::vector<Edge> boundary);
+    void fillHole(const std::vector<Edge>& boundary);
 
     void removeAllButLargestComponent();
 
     // method to get the centre of gravity of a set of vertices
-    Vertex getCentreOfGravity(const std::vector<int>& vertices);
+    Vertex getCentreOfGravity(const std::vector<int> &vertices);
 
     // method to remove any items in vector2 from vector1
-    void removeItems(std::vector<Edge>& vector1, const std::vector<Edge>& vector2);
+    static void removeItems(std::vector<Edge> &vector1, const std::vector<Edge> &vector2);
 
 
 protected:
-// method to get the angle between two edges
-float getAngleBetweenEdges(Edge edge1, Edge edge2);
+    // method to get the angle between two edges
+    float getAngleBetweenEdges(Edge edge1, Edge edge2);
+
+    // method to triangulate a hole
+    void triangulateHole(std::vector<Edge> &boundary);
+
+    // method to find the index of the smallest angle between two adjacent edges on a boundary
+    int findSmallestAngle(const std::vector<Edge>& boundary);
+
+    // method to test if an edge pair is a reflex angle
+    bool isReflexAngle(Edge edge1, Edge edge2);
+
+    // method to add the new directed edges and other half edges
+    void addNewDirectedEdges(int numFacesAdded);
+
+    // method to add missing triangles
+    void addMissingTriangles();
 };
 
 

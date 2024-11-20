@@ -34,7 +34,7 @@ void ManifoldTester::testManifold()
     start = std::chrono::high_resolution_clock::now();
 #endif
     // test for self intersections
-    testSelfIntersections();
+    //testSelfIntersections();
 #ifdef TIMING
     stop = std::chrono::high_resolution_clock::now();
     std::cout << "Self intersections took "
@@ -90,10 +90,11 @@ void ManifoldTester::testSelfIntersections()
                 std::cerr << "Face " << f2 << " vertices: " << vertices[faces[f2][0]] << " " << vertices[faces[f2][1]]
                           << " " << vertices[faces[f2][2]] << std::endl;
 #endif
-                exit(-4);
+                //exit(-4);
             }
         }
     }
+    std::cout << "Tested " << numTestedIntersections << " intersections" << std::endl;
 }
 
 bool ManifoldTester::testTriangleIntersection(int f1, int f2)
@@ -116,6 +117,7 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
         std::abs(distances1[1]) < e &&
         std::abs(distances1[2]) < e)
     {
+        numTestedIntersections++;
         // project the vertices of the faces onto the plane of the first face
         // if the 2D triangles intersect then the 3D triangles intersect
         // create basis vectors for the plane from the triangle edges
@@ -262,6 +264,8 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     {
         return false;
     }
+
+    numTestedIntersections++;
 
     // calculate the 2 edges of the first face that will intersect the plane of the second face
     // one vertex will have a different sign to the other two

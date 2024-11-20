@@ -31,6 +31,8 @@ protected:
     // method to test if the mesh contains multiple components
     void testMultipleComponents();
 
+    int numTestedIntersections = 0;
+
 
     // contains the vertex indices of each component
     std::vector<std::vector<int>> components;

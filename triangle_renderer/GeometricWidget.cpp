@@ -58,6 +58,8 @@ void GeometricWidget::initializeGL()
 	glShadeModel(GL_FLAT);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
+
+        glEnable(GL_CULL_FACE);
 	
 	// background is pink
 	glClearColor(1.0, 0.7, 0.7, 1.0);
@@ -80,8 +82,9 @@ void GeometricWidget::resizeGL(int w, int h)
 	float aspectRatio = (float) w / (float) h;
 	
 	// depending on aspect ratio, set to accomodate a sphere of radius = diagonal without clipping
-	if (aspectRatio > 1.0)
-		glOrtho(-aspectRatio * size, aspectRatio * size, -size, size, -size, size);
+    float zoom = 2.0;
+	if (aspectRatio <= 1.0)
+		glOrtho(-aspectRatio * size / zoom, aspectRatio * size / zoom, -size / zoom, size / zoom, -size / zoom, size / zoom);
 	else
 		glOrtho(-size, size, -size/aspectRatio, size/aspectRatio, -size, size);
 

@@ -23,11 +23,8 @@ private:
     // returns false if it does not maintain the eulerian condition
     bool removeVertex(int vertexIndex);
 
-    // method to triangulate a hole
-    void fillHole(std::vector<Edge>& boundary);
 
-    // method to find the index of the smallest angle between two adjacent edges on a boundary
-    int findSmallestAngle(const std::vector<Edge>& boundary);
+
 
     bool isEulerian();
 

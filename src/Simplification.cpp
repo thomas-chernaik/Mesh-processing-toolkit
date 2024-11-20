@@ -76,21 +76,18 @@ bool Simplification::removeVertex(int vertexIndex)
         if (face[0] == vertexIndex)
         {
             holeEdges.push_back({face[1], face[2]});
-            facesAdded++;
             // remove the face
             face = faces.back();
             faces.pop_back();
         } else if (face[1] == vertexIndex)
         {
             holeEdges.push_back({face[0], face[2]});
-            facesAdded++;
             // remove the face
             face = faces.back();
             faces.pop_back();
         } else if (face[2] == vertexIndex)
         {
             holeEdges.push_back({face[0], face[1]});
-            facesAdded++;
             // remove the face
             face = faces.back();
             faces.pop_back();
@@ -111,65 +108,15 @@ bool Simplification::removeVertex(int vertexIndex)
             }
         }
     }
+    int previousFaces = (int) faces.size();
     // triangulate the hole
-    fillHole(holeEdges);
+    triangulateHole(holeEdges);
+    facesAdded = (int) faces.size() - previousFaces;
 
     // check that the mesh is still eulerian
     return isEulerian();
 }
 
-void Simplification::fillHole(std::vector<Edge>& boundary)
-{
-    // order the boundary edges so that they form a single cycle
-    std::vector<Edge> orderedBoundary;
-    orderedBoundary.push_back(boundary[0]);
-    while(orderedBoundary.size() < boundary.size())
-    {
-        // get the last vertex of the last edge in the ordered boundary
-        int lastVertex = orderedBoundary.back().end;
-        // find the next edge that has the last vertex as the start
-        for (auto &edge: boundary)
-        {
-            if (edge.start == lastVertex)
-            {
-                orderedBoundary.push_back(edge);
-                break;
-            }
-        }
-    }
-    // while the boundary has more than 3 edges
-    while(boundary.size() > 3)
-    {
-        // get the two edges that form the smallest angle
-        int smallestAngleIndex = findSmallestAngle(orderedBoundary);
-        Edge smallestAngleEdge1 = orderedBoundary[smallestAngleIndex];
-        Edge smallestAngleEdge2 = orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()];
-        // add the triangle to the faces
-        faces.push_back({smallestAngleEdge1.start, smallestAngleEdge1.end, smallestAngleEdge2.end});
-    }
-    // add the last triangle
-    faces.push_back({orderedBoundary[0].start, orderedBoundary[0].end, orderedBoundary[1].end});
-
-}
-
-int Simplification::findSmallestAngle(const std::vector<Edge> &boundary)
-{
-    int smallestAngleIndex = 0;
-    float smallestAngle = 200.f;
-    for (int i = 0; i < boundary.size(); i++)
-    {
-        // get the two edges
-        Edge edge1 = boundary[i];
-        Edge edge2 = boundary[(i + 1) % boundary.size()];
-        float angleBetween = getAngleBetweenEdges(edge1, edge2);
-        if (angleBetween < smallestAngle)
-        {
-            smallestAngle = angleBetween;
-            smallestAngleIndex = i;
-        }
-    }
-    return smallestAngleIndex;
-}
 
 float Simplification::findCurvature(int vertexIndex)
 {
