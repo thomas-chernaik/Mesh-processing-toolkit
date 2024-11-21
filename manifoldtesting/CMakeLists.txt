@@ -7,8 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the executable
 add_executable(manifoldtesting main.cpp ../src/ManifoldTester.cpp ../src/DirectedEdge.cpp ../src/FaceIndex.cpp ../triangle_renderer/Cartesian3.cpp
-        ../src/TriangleIntersectionRendering.cpp
-        ../src/TriangleIntersectionRendering.h)
+)
 
 
 # link the utilities library to the executable

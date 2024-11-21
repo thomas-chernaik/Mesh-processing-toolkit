@@ -34,7 +34,7 @@ void ManifoldTester::testManifold()
     start = std::chrono::high_resolution_clock::now();
 #endif
     // test for self intersections
-    //testSelfIntersections();
+    testSelfIntersections();
 #ifdef TIMING
     stop = std::chrono::high_resolution_clock::now();
     std::cout << "Self intersections took "
@@ -372,10 +372,10 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
 
 void ManifoldTester::testMultipleComponents()
 {
-    // we have one component if we can reach every vertex from every other vertex i.e. the graph is connected
+    // we have one component if we can reach every face from every other face via a paired edge
     // we can do this by traversing the graph from one starting vertex and seeing if we can reach every other vertex
-    // create a vector of visited vertices, with false for unvisited and true for visited
-    std::vector<bool> visited(vertices.size(), false);
+    // create a vector of visited faces
+    std::vector<bool> visited(faces.size(), false);
 
     int numComponents = 0;
     components.clear();
@@ -384,35 +384,44 @@ void ManifoldTester::testMultipleComponents()
     { return !v; }))
     {
         numComponents++;
-        // create a stack of vertices to visit
+        // create a stack of faces to visit
         components.emplace_back();
         std::vector<int> toVisit;
-        // add the first unvisited vertex to the stack
+        // add the first unvisited face to the stack
         toVisit.push_back(std::find(visited.begin(), visited.end(), false) - visited.begin());
         // while there are still vertices to visit
         while (!toVisit.empty())
         {
-            // pop the last vertex from the stack
-            int currentVertex = toVisit.back();
+            // pop the last face from the stack
+            int currentFace = toVisit.back();
             toVisit.pop_back();
-            // if we have already visited this vertex then skip it
-            if (visited[currentVertex])
+            // if we have already visited this face then skip it
+            if (visited[currentFace])
             {
                 continue;
             }
-            // add the vertex to the component
-            components[numComponents - 1].push_back(currentVertex);
-            // mark the vertex as visited
-            visited[currentVertex] = true;
-            // get the one ring of the vertex
-            std::vector<int> oneRing = getOneRingVertices(currentVertex);
-            // for each vertex in the one ring
-            for (int v: oneRing)
+            // add the face to the component
+            components[numComponents - 1].push_back(currentFace);
+            // mark the face as visited
+            visited[currentFace] = true;
+            // get the three edges of the face
+            edge edges[3] = {currentFace * 3, currentFace * 3 + 1, currentFace * 3 + 2};
+            // get the three other half edges
+            int otherHalfEdges[3] = {otherHalf[edges[0]], otherHalf[edges[1]], otherHalf[edges[2]]};
+            // for each other half edge
+            for (int i = 0; i < 3; i++)
             {
-                // if the vertex hasn't been visited then add it to the stack
-                if (!visited[v])
+                // if the other half edge is unpaired then skip it
+                if (otherHalfEdges[i] == -1)
                 {
-                    toVisit.push_back(v);
+                    continue;
+                }
+                // get the face that the other half edge is paired to
+                int nextFace = otherHalfEdges[i] / 3;
+                // if we haven't visited the next face then add it to the stack
+                if (!visited[nextFace])
+                {
+                    toVisit.push_back(nextFace);
                 }
             }
         }
@@ -552,24 +561,20 @@ std::vector<int> ManifoldTester::CalculateGenus()
     int currentComponent = 0;
     for (auto &component: components)
     {
-        // the number of vertices in this component is the size
-        int verticesInComponent = (int) component.size();
-        // count the number of faces in this component
-        std::unordered_set<int> facesInComponent;
-        for (int v: component)
+        // the number of faces is the size of the component
+        int iFacesInComponent = component.size();
+        // the number of vertices is the number of unique vertices in the component
+        std::unordered_set<int> verticesInComponent;
+        for (int face: component)
         {
-            for (int i = 0; i < faces.size(); i++)
-            {
-                if (faces[i][0] == v || faces[i][1] == v || faces[i][2] == v)
-                {
-                    facesInComponent.insert(i);
-                }
-            }
+            verticesInComponent.insert(faces[face][0]);
+            verticesInComponent.insert(faces[face][1]);
+            verticesInComponent.insert(faces[face][2]);
         }
-        int iFacesInComponent = (int) facesInComponent.size();
+        int iVerticesInComponent = verticesInComponent.size();
         // the number of edges is the number of faces * 3 / 2
         int edgesInComponent = iFacesInComponent * 3 / 2;
-        int genusesInComponent = (2 - verticesInComponent + edgesInComponent - iFacesInComponent) / 2;
+        int genusesInComponent = (2 - iVerticesInComponent + edgesInComponent - iFacesInComponent) / 2;
         genuses[currentComponent++] = genusesInComponent;
     }
     return genuses;

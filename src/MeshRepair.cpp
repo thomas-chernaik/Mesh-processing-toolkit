@@ -72,27 +72,22 @@ void MeshRepair::removeAllButLargestComponent()
             largestComponent = i;
         }
     }
-    // for each vertex in the largest component
-    for (int i: components[largestComponent])
+    // for each face in the largest component
+    for (int faceIndex: components[largestComponent])
     {
-        // add the vertex to the new vertices
-        newVertices.push_back(vertices[i]);
-        // set the conversion from the old index to the new index
-        conversion[i] = (int) newVertices.size() - 1;
-    }
-    // for each vertex in the largest component
-    for (int i: components[largestComponent])
-    {
-        // for each face
-        for (auto &face: faces)
+        // for each vertex in the face
+        for (int i = 0; i < 3; i++)
         {
-            // if the face contains this vertex, and this is the lowest index vertex in the face
-            if ((face[0] == i || face[1] == i || face[2] == i) && (face[0] >= i && face[1] >= i && face[2] >= i))
+            // if we haven't already added the vertex to the newVertices vector
+            if (conversion[faces[faceIndex][i]] == -1)
             {
-                // add the face to the new faces
-                newFaces.push_back({conversion[face[0]], conversion[face[1]], conversion[face[2]]});
+                // add the vertex to the newVertices vector
+                conversion[faces[faceIndex][i]] = newVertices.size();
+                newVertices.push_back(vertices[faces[faceIndex][i]]);
             }
         }
+        // add the face to the newFaces vector
+        newFaces.push_back({conversion[faces[faceIndex][0]], conversion[faces[faceIndex][1]], conversion[faces[faceIndex][2]]});
     }
     // set the new vertices and faces
     vertices = newVertices;
@@ -179,15 +174,15 @@ void MeshRepair::fillHole(const std::vector<Edge> &boundary)
 {
     int previousFaces = (int) faces.size();
     std::cout << "filling hole with " << boundary.size() << " edges" << std::endl;
-    // if the boundary is a triangle then we can just add the face
-    if (boundary.size() == 3)
-    {
-        faces.push_back({boundary[0].end, boundary[0].start, boundary[1].end});
+//    // if the boundary is a triangle then we can just add the face
+//    if (boundary.size() == 3)
+//    {
+//        faces.push_back({boundary[0].end, boundary[0].start, boundary[1].end});
 //        // create the 3 new edges
 //        Edge edge1 = {boundary[0].start, boundary[0].end};
 //        Edge edge2 = {boundary[1].end, boundary[0].start};
 //        Edge edge3 = {boundary[0].end, boundary[1].end};
-//        otherHalf.resize(otherHalf.size() + 3, -1);
+//        otherHalf.resize(otherHalf.size() + 3, 1);
 //        edge currentEdge = 0;
 //        for (auto face: faces)
 //        {
@@ -196,24 +191,24 @@ void MeshRepair::fillHole(const std::vector<Edge> &boundary)
 //                if (face[i] == edge1.start && face[(i + 1) % 3] == edge1.end)
 //                {
 //                    otherHalf[currentEdge] = otherHalf.size() + 1;
-//                    otherHalf[otherHalf.size() + 1] = currentEdge;
+//                    otherHalf[otherHalf.size() - 3 + 1] = currentEdge;
 //                }
 //                if (face[i] == edge2.start && face[(i + 1) % 3] == edge2.end)
 //                {
 //                    otherHalf[currentEdge] = otherHalf.size() + 2;
-//                    otherHalf[otherHalf.size() + 2] = currentEdge;
+//                    otherHalf[otherHalf.size() - 3 + 2] = currentEdge;
 //                }
 //                if (face[i] == edge3.start && face[(i + 1) % 3] == edge3.end)
 //                {
 //                    otherHalf[currentEdge] = otherHalf.size() + 3;
-//                    otherHalf[otherHalf.size() + 3] = currentEdge;
+//                    otherHalf[otherHalf.size() - 3 + 3] = currentEdge;
 //                }
 //                currentEdge++;
 //            }
 //        }
-        constructDirectedEdges();
-        return;
-    }
+//
+//        return;
+//    }
     // get the set of vertices in the boundary
     std::vector<int> boundaryVertices;
     boundaryVertices.reserve(boundary.size());
@@ -256,6 +251,17 @@ std::vector<Edge> MeshRepair::walkAroundEdge(int edgeIndex)
     // while we haven't returned to the start
     while (!(nextEdge == firstEdge))
     {
+        // if we have already visited this vertex then we have a cycle and want to return from the previously visited vertex to the end
+        for (int i = 1; i < boundary.size(); i++)
+        {
+            if (boundary[i].start == nextEdge.end)
+            {
+                // remove the edges from the boundary
+                boundary.erase(boundary.begin(), boundary.begin() + i - 1);
+                boundary.push_back(nextEdge);
+                return boundary;
+            }
+        }
         // add the edge to the boundary
         boundary.push_back(nextEdge);
         // get the options for the next edge

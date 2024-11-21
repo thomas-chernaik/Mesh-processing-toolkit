@@ -1,6 +1,9 @@
 2ballout.tri Genus: 0
 2torus.tri Genus: 2
 5bout.tri Mesh is not manifold as faces 41 and 57 intersect
+Mesh is not manifold as faces 82 and 90 intersect
+Mesh is not manifold as faces 116 and 126 intersect
+Genus: 1
 747.tri Mesh is not manifold as edge 30 has no other half
 biplane.tri Mesh is not manifold as edge 123 has no other half
 bitorus.tri Genus: 2
@@ -9,17 +12,355 @@ cow.tri Mesh is not manifold as edge 230 has no other half
 cube.tri Genus: 0
 dodecahedron.tri Genus: 0
 fuelinject.tri Mesh is not manifold as edge 1429 has no other half
+hamish_40k_edit_repaired.tri Mesh is not manifold as faces 286 and 300 intersect
+Mesh is not manifold as faces 342 and 344 intersect
+Mesh is not manifold as faces 377 and 39462 intersect
+Mesh is not manifold as faces 378 and 39533 intersect
+Mesh is not manifold as faces 451 and 39604 intersect
+Mesh is not manifold as faces 456 and 39585 intersect
+Mesh is not manifold as faces 463 and 39598 intersect
+Mesh is not manifold as faces 473 and 584 intersect
+Mesh is not manifold as faces 490 and 39479 intersect
+Mesh is not manifold as faces 547 and 7894 intersect
+Mesh is not manifold as faces 552 and 7875 intersect
+Mesh is not manifold as faces 552 and 7901 intersect
+Mesh is not manifold as faces 556 and 561 intersect
+Mesh is not manifold as faces 559 and 34036 intersect
+Mesh is not manifold as faces 1064 and 1065 intersect
+Mesh is not manifold as faces 1546 and 39328 intersect
+Mesh is not manifold as faces 1577 and 39344 intersect
+Mesh is not manifold as faces 1772 and 1825 intersect
+Mesh is not manifold as faces 1820 and 1822 intersect
+Mesh is not manifold as faces 1847 and 39175 intersect
+Mesh is not manifold as faces 2288 and 39175 intersect
+Mesh is not manifold as faces 2438 and 39278 intersect
+Mesh is not manifold as faces 2493 and 39271 intersect
+Mesh is not manifold as faces 2587 and 2589 intersect
+Mesh is not manifold as faces 2589 and 2591 intersect
+Mesh is not manifold as faces 2600 and 4825 intersect
+Mesh is not manifold as faces 2620 and 2623 intersect
+Mesh is not manifold as faces 2756 and 2782 intersect
+Mesh is not manifold as faces 3096 and 8273 intersect
+Mesh is not manifold as faces 3690 and 3697 intersect
+Mesh is not manifold as faces 4304 and 4308 intersect
+Mesh is not manifold as faces 4309 and 6795 intersect
+Mesh is not manifold as faces 4340 and 6788 intersect
+Mesh is not manifold as faces 4622 and 4670 intersect
+Mesh is not manifold as faces 4626 and 4666 intersect
+Mesh is not manifold as faces 4669 and 36595 intersect
+Mesh is not manifold as faces 4681 and 4683 intersect
+Mesh is not manifold as faces 4808 and 4875 intersect
+Mesh is not manifold as faces 4973 and 4975 intersect
+Mesh is not manifold as faces 5062 and 5175 intersect
+Mesh is not manifold as faces 5062 and 38717 intersect
+Mesh is not manifold as faces 5063 and 5174 intersect
+Mesh is not manifold as faces 5789 and 38662 intersect
+Mesh is not manifold as faces 6315 and 6398 intersect
+Mesh is not manifold as faces 6320 and 6349 intersect
+Mesh is not manifold as faces 6337 and 6341 intersect
+Mesh is not manifold as faces 6400 and 6404 intersect
+Mesh is not manifold as faces 6509 and 6547 intersect
+Mesh is not manifold as faces 6519 and 6545 intersect
+Mesh is not manifold as faces 6536 and 6545 intersect
+Mesh is not manifold as faces 6545 and 6551 intersect
+Mesh is not manifold as faces 6750 and 6770 intersect
+Mesh is not manifold as faces 6829 and 6832 intersect
+Mesh is not manifold as faces 6845 and 36275 intersect
+Mesh is not manifold as faces 6845 and 36276 intersect
+Mesh is not manifold as faces 7346 and 9277 intersect
+Mesh is not manifold as faces 8533 and 33374 intersect
+Mesh is not manifold as faces 8622 and 33392 intersect
+Mesh is not manifold as faces 8726 and 8734 intersect
+Mesh is not manifold as faces 8726 and 8735 intersect
+Mesh is not manifold as faces 8731 and 9219 intersect
+Mesh is not manifold as faces 9144 and 9148 intersect
+Mesh is not manifold as faces 9146 and 9176 intersect
+Mesh is not manifold as faces 9178 and 9180 intersect
+Mesh is not manifold as faces 9178 and 9184 intersect
+Mesh is not manifold as faces 9178 and 9185 intersect
+Mesh is not manifold as faces 9390 and 9397 intersect
+Mesh is not manifold as faces 9390 and 13060 intersect
+Mesh is not manifold as faces 10542 and 10545 intersect
+Mesh is not manifold as faces 11033 and 32734 intersect
+Mesh is not manifold as faces 11039 and 32689 intersect
+Mesh is not manifold as faces 12326 and 12328 intersect
+Mesh is not manifold as faces 12482 and 12503 intersect
+Mesh is not manifold as faces 12482 and 12566 intersect
+Mesh is not manifold as faces 13061 and 13141 intersect
+Mesh is not manifold as faces 14023 and 14026 intersect
+Mesh is not manifold as faces 14079 and 14086 intersect
+Mesh is not manifold as faces 14495 and 14497 intersect
+Mesh is not manifold as faces 14496 and 30252 intersect
+Mesh is not manifold as faces 16444 and 16446 intersect
+Mesh is not manifold as faces 17684 and 17686 intersect
+Mesh is not manifold as faces 17710 and 30362 intersect
+Mesh is not manifold as faces 19551 and 19553 intersect
+Mesh is not manifold as faces 20323 and 20345 intersect
+Mesh is not manifold as faces 20451 and 20454 intersect
+Mesh is not manifold as faces 21216 and 21219 intersect
+Mesh is not manifold as faces 21653 and 21665 intersect
+Mesh is not manifold as faces 21839 and 22907 intersect
+Mesh is not manifold as faces 22541 and 28692 intersect
+Mesh is not manifold as faces 22541 and 28693 intersect
+Mesh is not manifold as faces 22739 and 28616 intersect
+Mesh is not manifold as faces 22849 and 23927 intersect
+Mesh is not manifold as faces 23727 and 27929 intersect
+Mesh is not manifold as faces 24307 and 24309 intersect
+Mesh is not manifold as faces 24491 and 24505 intersect
+Mesh is not manifold as faces 24511 and 25340 intersect
+Mesh is not manifold as faces 25284 and 25290 intersect
+Mesh is not manifold as faces 26413 and 26418 intersect
+Mesh is not manifold as faces 27623 and 27653 intersect
+Mesh is not manifold as faces 27638 and 27646 intersect
+Mesh is not manifold as faces 28785 and 28916 intersect
+Mesh is not manifold as faces 28786 and 28883 intersect
+Mesh is not manifold as faces 29771 and 29829 intersect
+Mesh is not manifold as faces 29778 and 29822 intersect
+Mesh is not manifold as faces 30527 and 30532 intersect
+Mesh is not manifold as faces 32396 and 32402 intersect
+Mesh is not manifold as faces 32411 and 32421 intersect
+Mesh is not manifold as faces 32700 and 32735 intersect
+Mesh is not manifold as faces 32725 and 32741 intersect
+Mesh is not manifold as faces 34082 and 34148 intersect
+Mesh is not manifold as faces 34106 and 36181 intersect
+Mesh is not manifold as faces 35040 and 35043 intersect
+Mesh is not manifold as faces 35040 and 35908 intersect
+Mesh is not manifold as faces 36251 and 36254 intersect
+Mesh is not manifold as faces 36463 and 36477 intersect
+Mesh is not manifold as faces 36464 and 36467 intersect
+Mesh is not manifold as faces 37016 and 37018 intersect
+Mesh is not manifold as faces 37731 and 37733 intersect
+Mesh is not manifold as faces 37915 and 37918 intersect
+Mesh is not manifold as faces 38154 and 38365 intersect
+Mesh is not manifold as faces 38154 and 38366 intersect
+Mesh is not manifold as faces 38360 and 38427 intersect
+Mesh is not manifold as faces 38568 and 38589 intersect
+Mesh is not manifold as faces 38568 and 38590 intersect
+Mesh is not manifold as faces 38710 and 38714 intersect
+Mesh is not manifold as faces 39160 and 39185 intersect
+Mesh is not manifold as faces 39168 and 39196 intersect
+Mesh is not manifold as faces 39446 and 39459 intersect
+Mesh is not manifold as faces 39447 and 39459 intersect
+Mesh is not manifold as faces 39460 and 39489 intersect
+Mesh is not manifold as faces 39463 and 39499 intersect
+Mesh is not manifold as faces 39496 and 39535 intersect
+Mesh is not manifold as faces 39497 and 39535 intersect
+Mesh is not manifold as faces 39497 and 39538 intersect
+Mesh is not manifold as faces 39499 and 39531 intersect
+Mesh is not manifold as faces 39507 and 39516 intersect
+Mesh is not manifold as faces 39511 and 39558 intersect
+Mesh is not manifold as faces 39513 and 39560 intersect
+Mesh is not manifold as faces 39514 and 39559 intersect
+Mesh is not manifold as faces 39514 and 39560 intersect
+Mesh is not manifold as faces 39516 and 39562 intersect
+Mesh is not manifold as faces 39518 and 39563 intersect
+Mesh is not manifold as faces 39519 and 39563 intersect
+Mesh is not manifold as faces 39548 and 39551 intersect
+Mesh is not manifold as faces 39550 and 39564 intersect
+Mesh is not manifold as faces 39555 and 39561 intersect
+Mesh is not manifold as faces 39558 and 39560 intersect
+Mesh is not manifold as faces 39589 and 39596 intersect
+Mesh is not manifold as faces 39592 and 39600 intersect
+Mesh is not manifold as faces 39726 and 39728 intersect
+Mesh is not manifold as faces 39752 and 39754 intersect
+Mesh is not manifold as faces 39753 and 39755 intersect
+Mesh is not manifold as faces 39754 and 39756 intersect
+Mesh is not manifold as faces 39755 and 39757 intersect
+Mesh is not manifold as faces 39756 and 39758 intersect
+Mesh is not manifold as faces 39757 and 39759 intersect
+Mesh is not manifold as faces 39758 and 39760 intersect
+Mesh is not manifold as faces 39759 and 39761 intersect
+Mesh is not manifold as faces 39897 and 39899 intersect
+Mesh is not manifold as faces 39942 and 39944 intersect
+Mesh is not manifold as faces 39943 and 39945 intersect
+Mesh is not manifold as faces 40135 and 40137 intersect
+Genus: 0
+hamish_40k_edit.tri Mesh is not manifold as edge 1 has no other half
+Hamish_repaired.tri Mesh is not manifold as edge 1437 has multiple other halves
 Hamish.tri Mesh is not manifold as edge 551 has no other half
 hexahedron.tri Genus: 0
 horse.tri Mesh is not manifold as faces 9 and 53 intersect
-icosahedron.tri Genus: 0
+Mesh is not manifold as faces 11 and 12 intersect
+Mesh is not manifold as faces 19 and 53 intersect
+Mesh is not manifold as faces 310 and 361 intersect
+Mesh is not manifold as faces 310 and 363 intersect
+Mesh is not manifold as faces 609 and 681 intersect
+Mesh is not manifold as faces 1072 and 1234 intersect
+Mesh is not manifold as faces 1918 and 1966 intersect
+Mesh is not manifold as faces 2256 and 2270 intersect
+Mesh is not manifold as faces 3477 and 3661 intersect
+Mesh is not manifold as faces 4386 and 4400 intersect
+Mesh is not manifold as faces 4386 and 4457 intersect
+Mesh is not manifold as faces 4435 and 4514 intersect
+Mesh is not manifold as faces 4500 and 4568 intersect
+Mesh is not manifold as faces 4500 and 4617 intersect
+Mesh is not manifold as faces 4549 and 4685 intersect
+Mesh is not manifold as faces 4689 and 4723 intersect
+Mesh is not manifold as faces 4690 and 4753 intersect
+Mesh is not manifold as faces 4871 and 4931 intersect
+Mesh is not manifold as faces 4920 and 5128 intersect
+Mesh is not manifold as faces 5078 and 5620 intersect
+Mesh is not manifold as faces 5377 and 5510 intersect
+Mesh is not manifold as faces 5377 and 5602 intersect
+Mesh is not manifold as faces 5447 and 5514 intersect
+Mesh is not manifold as faces 5961 and 6081 intersect
+Mesh is not manifold as faces 6062 and 6173 intersect
+Mesh is not manifold as faces 6078 and 6376 intersect
+Mesh is not manifold as faces 6084 and 6121 intersect
+Mesh is not manifold as faces 6084 and 6192 intersect
+Mesh is not manifold as faces 6112 and 6156 intersect
+Mesh is not manifold as faces 6121 and 6192 intersect
+Mesh is not manifold as faces 6412 and 6663 intersect
+Mesh is not manifold as faces 6593 and 6876 intersect
+Mesh is not manifold as faces 6789 and 6835 intersect
+Mesh is not manifold as faces 6892 and 7282 intersect
+Mesh is not manifold as faces 6911 and 7260 intersect
+Mesh is not manifold as faces 6968 and 7041 intersect
+Mesh is not manifold as faces 7222 and 7334 intersect
+Mesh is not manifold as faces 7546 and 7584 intersect
+Mesh is not manifold as faces 7889 and 7935 intersect
+Mesh is not manifold as faces 8027 and 8226 intersect
+Mesh is not manifold as faces 8050 and 8227 intersect
+Mesh is not manifold as faces 8148 and 8235 intersect
+Mesh is not manifold as faces 8352 and 8723 intersect
+Mesh is not manifold as faces 8363 and 9129 intersect
+Mesh is not manifold as faces 8502 and 8701 intersect
+Mesh is not manifold as faces 9134 and 9536 intersect
+Mesh is not manifold as faces 9212 and 9536 intersect
+Mesh is not manifold as faces 9407 and 9502 intersect
+Mesh is not manifold as faces 9615 and 10469 intersect
+Mesh is not manifold as faces 9662 and 9917 intersect
+Mesh is not manifold as faces 9842 and 10182 intersect
+Mesh is not manifold as faces 10410 and 11075 intersect
+Mesh is not manifold as faces 11348 and 11954 intersect
+Mesh is not manifold as faces 12212 and 12218 intersect
+Mesh is not manifold as faces 12663 and 13250 intersect
+Mesh is not manifold as faces 14018 and 14129 intersect
+Mesh is not manifold as faces 14776 and 15052 intersect
+Mesh is not manifold as faces 15078 and 15409 intersect
+Mesh is not manifold as faces 15475 and 16224 intersect
+Mesh is not manifold as faces 15482 and 16341 intersect
+Mesh is not manifold as faces 15776 and 16469 intersect
+Mesh is not manifold as faces 15812 and 16663 intersect
+Mesh is not manifold as faces 16227 and 16457 intersect
+Mesh is not manifold as faces 16571 and 17505 intersect
+Mesh is not manifold as faces 16591 and 17418 intersect
+Mesh is not manifold as faces 16790 and 17101 intersect
+Mesh is not manifold as faces 16790 and 17431 intersect
+Mesh is not manifold as faces 17143 and 17717 intersect
+Mesh is not manifold as faces 17674 and 18173 intersect
+Mesh is not manifold as faces 17709 and 17754 intersect
+Mesh is not manifold as faces 17793 and 19092 intersect
+Mesh is not manifold as faces 18162 and 18614 intersect
+Mesh is not manifold as faces 18690 and 19698 intersect
+Mesh is not manifold as faces 18748 and 20832 intersect
+Mesh is not manifold as faces 19009 and 19636 intersect
+Mesh is not manifold as faces 19061 and 19222 intersect
+Mesh is not manifold as faces 19328 and 19636 intersect
+Mesh is not manifold as faces 19477 and 19480 intersect
+Mesh is not manifold as faces 19519 and 19806 intersect
+Mesh is not manifold as faces 19801 and 20441 intersect
+Mesh is not manifold as faces 19869 and 20031 intersect
+Mesh is not manifold as faces 19869 and 20494 intersect
+Mesh is not manifold as faces 20262 and 20988 intersect
+Mesh is not manifold as faces 20264 and 20973 intersect
+Mesh is not manifold as faces 20264 and 21295 intersect
+Mesh is not manifold as faces 20437 and 20438 intersect
+Mesh is not manifold as faces 20459 and 20556 intersect
+Mesh is not manifold as faces 20857 and 20930 intersect
+Mesh is not manifold as faces 21485 and 21507 intersect
+Mesh is not manifold as faces 21945 and 22670 intersect
+Mesh is not manifold as faces 22188 and 22413 intersect
+Mesh is not manifold as faces 22273 and 22668 intersect
+Mesh is not manifold as faces 22297 and 22686 intersect
+Mesh is not manifold as faces 22297 and 23409 intersect
+Mesh is not manifold as faces 22299 and 22378 intersect
+Mesh is not manifold as faces 22425 and 24314 intersect
+Mesh is not manifold as faces 22550 and 22622 intersect
+Mesh is not manifold as faces 23233 and 23419 intersect
+Mesh is not manifold as faces 23346 and 23758 intersect
+Mesh is not manifold as faces 23416 and 23458 intersect
+Mesh is not manifold as faces 23772 and 23900 intersect
+Mesh is not manifold as faces 23887 and 24565 intersect
+Mesh is not manifold as faces 24086 and 24091 intersect
+Mesh is not manifold as faces 24449 and 25035 intersect
+Mesh is not manifold as faces 24519 and 24932 intersect
+Mesh is not manifold as faces 24632 and 24746 intersect
+Mesh is not manifold as faces 24868 and 25066 intersect
+Mesh is not manifold as faces 25001 and 25362 intersect
+Mesh is not manifold as faces 25128 and 25945 intersect
+Mesh is not manifold as faces 25287 and 25906 intersect
+Mesh is not manifold as faces 25390 and 26178 intersect
+Mesh is not manifold as faces 25875 and 26462 intersect
+Mesh is not manifold as faces 26127 and 26410 intersect
+Mesh is not manifold as faces 26219 and 27138 intersect
+Mesh is not manifold as faces 26508 and 26680 intersect
+Mesh is not manifold as faces 26573 and 26686 intersect
+Mesh is not manifold as faces 26662 and 27026 intersect
+Mesh is not manifold as faces 26750 and 26869 intersect
+Mesh is not manifold as faces 27051 and 27156 intersect
+Mesh is not manifold as faces 27201 and 27652 intersect
+Mesh is not manifold as faces 27559 and 27778 intersect
+Mesh is not manifold as faces 27799 and 27874 intersect
+Mesh is not manifold as faces 27799 and 28258 intersect
+Mesh is not manifold as faces 27963 and 28885 intersect
+Mesh is not manifold as faces 27963 and 29558 intersect
+Mesh is not manifold as faces 28120 and 28614 intersect
+Mesh is not manifold as faces 28167 and 28597 intersect
+Mesh is not manifold as faces 28558 and 28718 intersect
+Mesh is not manifold as faces 30522 and 30626 intersect
+Mesh is not manifold as faces 30716 and 31294 intersect
+Mesh is not manifold as faces 31174 and 31538 intersect
+Mesh is not manifold as faces 31477 and 31676 intersect
+Mesh is not manifold as faces 31494 and 32029 intersect
+Mesh is not manifold as faces 31549 and 31576 intersect
+Mesh is not manifold as faces 31605 and 31965 intersect
+Mesh is not manifold as faces 31677 and 32633 intersect
+Mesh is not manifold as faces 32426 and 32502 intersect
+Mesh is not manifold as faces 32498 and 32574 intersect
+Mesh is not manifold as faces 32636 and 32762 intersect
+Mesh is not manifold as faces 32714 and 32779 intersect
+Mesh is not manifold as faces 32790 and 32827 intersect
+Mesh is not manifold as faces 33998 and 34010 intersect
+Mesh is not manifold as faces 34175 and 34887 intersect
+Mesh is not manifold as faces 34293 and 34406 intersect
+Mesh is not manifold as faces 34503 and 34801 intersect
+Mesh is not manifold as faces 34705 and 34802 intersect
+Mesh is not manifold as faces 34872 and 35160 intersect
+Mesh is not manifold as faces 35683 and 35710 intersect
+Mesh is not manifold as faces 35855 and 36145 intersect
+Mesh is not manifold as faces 35861 and 36075 intersect
+Mesh is not manifold as faces 36253 and 36357 intersect
+Mesh is not manifold as faces 36302 and 36360 intersect
+Mesh is not manifold as faces 36305 and 36311 intersect
+Mesh is not manifold as faces 36565 and 36748 intersect
+Mesh is not manifold as faces 36617 and 36797 intersect
+Mesh is not manifold as faces 36617 and 36833 intersect
+Mesh is not manifold as faces 36797 and 37108 intersect
+Mesh is not manifold as faces 37371 and 37577 intersect
+Mesh is not manifold as faces 37641 and 37650 intersect
+Mesh is not manifold as faces 38111 and 38231 intersect
+Mesh is not manifold as faces 38111 and 38353 intersect
+Mesh is not manifold as faces 38867 and 38871 intersect
+Mesh is not manifold as faces 38890 and 38895 intersect
+Mesh is not manifold as faces 38924 and 38947 intersect
+Mesh is not manifold as faces 38947 and 39005 intersect
+Mesh is not manifold as faces 39508 and 39527 intersect
+Mesh is not manifold as faces 39555 and 39556 intersect
+Genus: 0
+icosahedron_repaired.tri Mesh is not manifold as faces 21 and 22 intersect
+Genus: 0
+icosahedron.tri Mesh is not manifold as edge 0 has no other half
 legoman.tri Mesh is not manifold as edge 147 has no other half
 many.tri Genus: 0
 octahedron.tri Genus: 0
 quadtorus.tri Genus: 4
 skeleton.tri Mesh is not manifold as edge 1053 has no other half
+test_repaired.tri Mesh is not manifold as edge 1 has multiple other halves
+test.tri Mesh is not manifold as edge 0 has no other half
 tetrahedron_bad.tri Mesh is not manifold as edge 0 has no other half
 tetrahedronpinch.tri Mesh is not manifold as vertex 0 has a pinch point
+tetrahedron_repaired.tri Genus: 0
 tetrahedron.tri Genus: 0
 torus.tri Genus: 1
 tritorus.tri Genus: 3
