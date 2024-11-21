@@ -36,7 +36,7 @@ protected:
 
     bool readWithErrors = false;
 
-    void error(const std::string& message, int exitCode = -1)
+    void error(const std::string& message, int exitCode = -1) const
     {
         if (!readWithErrors)
         {

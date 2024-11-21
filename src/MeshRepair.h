@@ -44,9 +44,6 @@ private:
 
     void removeAllButLargestComponent();
 
-    // method to get the centre of gravity of a set of vertices
-    Vertex getCentreOfGravity(const std::vector<int> &vertices);
-
     // method to remove any items in vector2 from vector1
     static void removeItems(std::vector<Edge> &vector1, const std::vector<Edge> &vector2);
 
@@ -55,11 +52,6 @@ protected:
     // method to get the angle between two edges
     float getAngleBetweenEdges(Edge edge1, Edge edge2);
 
-    // method to triangulate a hole
-    void triangulateHole(std::vector<Edge> &boundary);
-
-    // method to find the index of the smallest angle between two adjacent edges on a boundary
-    int findSmallestAngle(const std::vector<Edge>& boundary);
 
     // method to test if an edge pair is a reflex angle
     bool isReflexAngle(Edge edge1, Edge edge2);
@@ -67,8 +59,8 @@ protected:
     // method to add the new directed edges and other half edges
     void addNewDirectedEdges(int numFacesAdded);
 
-    // method to add missing triangles
-    void addMissingTriangles();
+// method to get the centre of gravity of a set of vertices
+Vertex getCentreOfGravity(const std::vector<int> &vertices);
 };
 
 

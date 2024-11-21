@@ -12,20 +12,4 @@ Build instructions:
 
 The project will then be built.
 
-Running instructions:
-
-The face to face index converter program (Question 1(a) can be run as follows:
-./<path_to_build>/face2faceindex/face2faceindex [path_to_.tri_file]
-if no path is given, the program will prompt for the path.
-A .face file will be created at the same path as the .tri file, with the same name.
-
-The face index to directed edge converter program (Question 1(b)) can be run as follows:
-./<path_to_build>/faceindex2directededge/faceindex2directededge [path_to_.face_file]
-if no path is given, the program will prompt for the path.
-A .diredge file will be created at the same path as the .face file, with the same name.
-
-The manifold testing program (Question 2) can be run as follows:
-./<path_to_build>/manifoldtest/manifoldtest [path_to_.tri_file] [path_to_.face_file]
-if no path is given, the program will prompt for the path.
-A .diredge file will be created at the same path as the .face file, and if applicable, a .face file will be created at the same path as the .tri file, with the same name.
-The program will output whether the mesh is a manifold or not, and if not manifold, will explain why.
+see the readme in the directories of the individual programs for instructions on running them, and more information on what they do.

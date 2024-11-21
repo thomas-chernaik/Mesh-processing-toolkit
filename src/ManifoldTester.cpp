@@ -409,15 +409,15 @@ void ManifoldTester::testMultipleComponents()
             // get the three other half edges
             int otherHalfEdges[3] = {otherHalf[edges[0]], otherHalf[edges[1]], otherHalf[edges[2]]};
             // for each other half edge
-            for (int i = 0; i < 3; i++)
+            for (int otherHalfEdge : otherHalfEdges)
             {
                 // if the other half edge is unpaired then skip it
-                if (otherHalfEdges[i] == -1)
+                if (otherHalfEdge == -1)
                 {
                     continue;
                 }
                 // get the face that the other half edge is paired to
-                int nextFace = otherHalfEdges[i] / 3;
+                int nextFace = otherHalfEdge / 3;
                 // if we haven't visited the next face then add it to the stack
                 if (!visited[nextFace])
                 {
@@ -562,7 +562,7 @@ std::vector<int> ManifoldTester::CalculateGenus()
     for (auto &component: components)
     {
         // the number of faces is the size of the component
-        int iFacesInComponent = component.size();
+        int iFacesInComponent = (int) component.size();
         // the number of vertices is the number of unique vertices in the component
         std::unordered_set<int> verticesInComponent;
         for (int face: component)
@@ -571,32 +571,13 @@ std::vector<int> ManifoldTester::CalculateGenus()
             verticesInComponent.insert(faces[face][1]);
             verticesInComponent.insert(faces[face][2]);
         }
-        int iVerticesInComponent = verticesInComponent.size();
+        int iVerticesInComponent = (int)verticesInComponent.size();
         // the number of edges is the number of faces * 3 / 2
         int edgesInComponent = iFacesInComponent * 3 / 2;
         int genusesInComponent = (2 - iVerticesInComponent + edgesInComponent - iFacesInComponent) / 2;
         genuses[currentComponent++] = genusesInComponent;
     }
     return genuses;
-}
-
-std::vector<int> ManifoldTester::getOneRingVertices(int vertexIndex)
-{
-    std::vector<int> oneRingVertices;
-
-    // get the one ring of the vertex
-    for (auto &face: faces)
-    {
-        for (int v = 0; v < 3; v++)
-        {
-            if (face[v] == vertexIndex)
-            {
-                oneRingVertices.push_back(face[(v + 1) % 3]);
-                oneRingVertices.push_back(face[(v + 2) % 3]);
-            }
-        }
-    }
-    return oneRingVertices;
 }
 
 void ManifoldTester::readFileDiredge(const std::string &filename)

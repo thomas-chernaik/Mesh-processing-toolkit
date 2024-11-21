@@ -19,9 +19,33 @@ private:
     // method to find the mean/gaussian curvature of a vertex
     float findCurvature(int vertexIndex);
 
+    // method to find the mean curvature of a vertex
+    float findMeanCurvature(int vertexIndex);
+
+    // method to find the gaussian curvature of a vertex
+    float findGaussianCurvature(int vertexIndex);
+
+    // method to compute the discrete laplace beltrami operator of a vertex
+    Cartesian3 computeLaplaceBeltrami(int vertexIndex);
+
+    // method to get the vertices in the one ring of a vertex
+    std::vector<int> getOneRingVertices(int vertexIndex);
+
+    // method to get the normal of a vertex
+    Cartesian3 getNormal(int vertexIndex);
+
+    // method to get the angle between two vectors
+    float getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vector2);
+
     // method to remove a vertex from the mesh and triangulate the hole
     // returns false if it does not maintain the eulerian condition
     bool removeVertex(int vertexIndex);
+
+    // method to find the smallest angle between two adjacent edges on a boundary
+    int findSmallestAngle(const std::vector<Edge> &boundary);
+
+    // method to triangulate a hole
+    void triangulateHole(std::vector<Edge> &boundary);
 
 
 
@@ -37,6 +61,7 @@ private:
     Vertex removedVertex;
     void backtrack();
 
+    float getAreaOfVertex(std::vector<int> vector1, int index);
 };
 
 

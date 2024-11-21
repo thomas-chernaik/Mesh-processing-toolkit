@@ -40,8 +40,6 @@ protected:
     // method to get the one ring (as a list of edge indices) of a vertex
     std::vector<Edge> getOneRing(int vertexIndex);
 
-    // method to get the one ring (as a list of vertex indices) of a vertex
-    std::vector<int> getOneRingVertices(int vertexIndex);
 
 // returns the dot product of two Cartesian3 vectors
 static float dotProduct(const Cartesian3 &a, const Cartesian3 &b)

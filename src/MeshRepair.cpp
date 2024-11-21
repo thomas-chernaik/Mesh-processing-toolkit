@@ -5,7 +5,6 @@
 #include "MeshRepair.h"
 
 #include <cmath>
-#include <cassert>
 
 // find the first unpaired edge (pair is -1)
 int MeshRepair::findLooseEdge()
@@ -48,7 +47,7 @@ void MeshRepair::repairMesh()
                 numUnpairedEdges++;
             }
         }
-        std::cout << "Number of unpaired edges: " << numUnpairedEdges << std::endl;
+        //std::cout << "Number of unpaired edges: " << numUnpairedEdges << std::endl;
         if (numUnpairedEdges == 1)
             break;
     }
@@ -82,7 +81,7 @@ void MeshRepair::removeAllButLargestComponent()
             if (conversion[faces[faceIndex][i]] == -1)
             {
                 // add the vertex to the newVertices vector
-                conversion[faces[faceIndex][i]] = newVertices.size();
+                conversion[faces[faceIndex][i]] = (int) newVertices.size();
                 newVertices.push_back(vertices[faces[faceIndex][i]]);
             }
         }
@@ -95,7 +94,7 @@ void MeshRepair::removeAllButLargestComponent()
     int count = 0;
     for (auto i: otherHalf)
     { if (i == -1) count++; }
-    std::cout << "Number of unpaired edges: " << count << std::endl;
+    //std::cout << "Number of unpaired edges: " << count << std::endl;
     // generate the directed edges and other half
     constructDirectedEdges();
     // calculate the different components
@@ -103,7 +102,7 @@ void MeshRepair::removeAllButLargestComponent()
     count = 0;
     for (auto i: otherHalf)
     { if (i == -1) count++; }
-    std::cout << "Number of unpaired edges: " << count << std::endl;
+    //std::cout << "Number of unpaired edges: " << count << std::endl;
     // if there is still more than one component I did smth wrong with the code
     if (components.size() > 1)
     {
@@ -316,8 +315,7 @@ Edge MeshRepair::chooseSmallestAngledEdge(std::vector<Edge> edges, Edge currentE
     {
         return edges[0];
     }
-    std::cout << "Choosing smallest angle from " << edges.size() << " edges" << std::endl;
-    // TODO: make this handle reflex angles
+    //std::cout << "Choosing smallest angle from " << edges.size() << " edges" << std::endl;
     Edge smallestAngleEdge = edges[0];
     float smallestAngle = getAngleBetweenEdges(currentEdge, edges[0]);
     // loop through edges 2 - n and find the smallest angle
@@ -338,7 +336,7 @@ float MeshRepair::getAngleBetweenEdges(Edge edge1, Edge edge2)
     // use the dot product to find the angle between two vectors without acos
     Cartesian3 edge1Vector = vertices[edge1.end] - vertices[edge1.start];
     Cartesian3 edge2Vector = vertices[edge2.start] - vertices[edge2.end];
-    float result = (float) -(dotProduct(edge1Vector, edge2Vector) / (edge1Vector.length() * edge2Vector.length()));
+    auto result = (float) -(dotProduct(edge1Vector, edge2Vector) / (edge1Vector.length() * edge2Vector.length()));
     // test if the angle is reflex, if it is we want to return the -result + 2
     if (isReflexAngle(edge1, edge2))
     {
@@ -356,7 +354,7 @@ Vertex MeshRepair::getCentreOfGravity(const std::vector<int> &vertices)
         centreOfGravity = centreOfGravity + this->vertices[i];
     }
     // divide by the number of vertices
-    centreOfGravity = centreOfGravity / (int) vertices.size();
+    centreOfGravity = centreOfGravity / (float) vertices.size();
     return centreOfGravity;
 }
 
@@ -378,85 +376,25 @@ void MeshRepair::removeItems(std::vector<Edge> &vector1, const std::vector<Edge>
 }
 
 
-void MeshRepair::triangulateHole(std::vector<Edge> &boundary)
-{
-    // order the boundary edges so that they form a single cycle
-    std::vector<Edge> orderedBoundary;
-    orderedBoundary.push_back(boundary[0]);
-    while (orderedBoundary.size() < boundary.size())
-    {
-        // get the last vertex of the last edge in the ordered boundary
-        int lastVertex = orderedBoundary.back().end;
-        // find the next edge that has the last vertex as the start
-        for (auto &edge: boundary)
-        {
-            if (edge.start == lastVertex)
-            {
-                orderedBoundary.push_back(edge);
-                break;
-            }
-        }
-    }
-    // while the boundary has more than 3 edges
-    while (boundary.size() > 3)
-    {
-        // get the two edges that form the smallest angle
-        int smallestAngleIndex = findSmallestAngle(orderedBoundary);
-        Edge smallestAngleEdge1 = orderedBoundary[smallestAngleIndex];
-        Edge smallestAngleEdge2 = orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()];
-        // add the triangle to the faces
-        faces.push_back({smallestAngleEdge1.start, smallestAngleEdge1.end, smallestAngleEdge2.end});
-        // remove the edges from the boundary
-        orderedBoundary.erase(orderedBoundary.begin() + smallestAngleIndex);
-        orderedBoundary.erase(orderedBoundary.begin() + smallestAngleIndex);
-        // add the new edge to the boundary
-        orderedBoundary.push_back({smallestAngleEdge1.start, smallestAngleEdge2.end});
-    }
-    // add the last triangle
-    faces.push_back({orderedBoundary[0].start, orderedBoundary[0].end, orderedBoundary[1].end});
-
-}
-
-
-int MeshRepair::findSmallestAngle(const std::vector<Edge> &boundary)
-{
-    int smallestAngleIndex = 0;
-    float smallestAngle = 200.f;
-    for (int i = 0; i < boundary.size(); i++)
-    {
-        // get the two edges
-        Edge edge1 = boundary[i];
-        Edge edge2 = boundary[(i + 1) % boundary.size()];
-        float angleBetween = getAngleBetweenEdges(edge1, edge2);
-        if (angleBetween < smallestAngle)
-        {
-            smallestAngle = angleBetween;
-            smallestAngleIndex = i;
-        }
-    }
-    return smallestAngleIndex;
-}
-
-// idk how to test a reflex angle
 bool MeshRepair::isReflexAngle(Edge edge1, Edge edge2)
 {
 //    std::cout << "reflexing ";
     // early exit if the edges belong to the same face
     // find the third point of the face that edge1 belongs to
     int thirdPoint = -1;
-    for (int i = 0; i < faces.size(); i++)
+    for (auto & face : faces)
     {
-        if ((faces[i][0] == edge1.start && faces[i][1] == edge1.end))
+        if ((face[0] == edge1.start && face[1] == edge1.end))
         {
-            thirdPoint = faces[i][2];
+            thirdPoint = face[2];
             break;
-        } else if (faces[i][1] == edge1.start && faces[i][2] == edge1.end)
+        } else if (face[1] == edge1.start && face[2] == edge1.end)
         {
-            thirdPoint = faces[i][0];
+            thirdPoint = face[0];
             break;
-        } else if (faces[i][2] == edge1.start && faces[i][0] == edge1.end)
+        } else if (face[2] == edge1.start && face[0] == edge1.end)
         {
-            thirdPoint = faces[i][1];
+            thirdPoint = face[1];
             break;
         }
     }
@@ -513,12 +451,12 @@ void MeshRepair::addNewDirectedEdges(int numFacesAdded)
     directedEdges.push_back(firstDirectedEdge * 3 + 2);
     // the first edge of each new face will be paired to a previously unpaired edge
     // add these first
-    for (int i = faces.size() - numFacesAdded; i < faces.size(); i++)
+    for (int i = (int)faces.size() - numFacesAdded; i < faces.size(); i++)
     {
         // get the first edge of the face
         Edge firstEdge = {faces[i][0], faces[i][1]};
         // find the edge that pairs to this edge - there is guaranteed to be one
-        int otherHalfIndex = -1;
+        int otherHalfIndex;
         for (int j = 0; j < faces.size() - numFacesAdded; j++)
         {
             // get the three edges of the face
@@ -544,11 +482,5 @@ void MeshRepair::addNewDirectedEdges(int numFacesAdded)
         }
 
     }
-
-}
-
-void MeshRepair::addMissingTriangles()
-{
-    // find any complete triangles made of unpaired edges
 
 }
