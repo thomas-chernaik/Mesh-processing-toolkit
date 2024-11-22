@@ -11,19 +11,34 @@ void Simplification::simplifyMesh()
     // TODO: work out exit conditions
     //  for now, if there is no vertex that can be removed without breaking the eulerian condition, then we exit
     bool removed = true;
-    while (removed)
+    for (int i = 0; i < 1000; i++)
     {
+        // -debug - write the mesh to a file with the iteration number
+        // if its a multiple of 10
+        if (i % 10 == 0)
+        {
+            //writeRepairedMeshTri("iteration" + std::to_string(i));
+        }
+        //writeRepairedMeshTri("iteration" + std::to_string(i));
         removed = false;
         int currentVertex = 0;
         int smallestCurvature = findSmallestCurvature(0);
+        // print out the vertex with the smallest curvature
         while (!removed && currentVertex < vertices.size())
         {
+            std::cout << "Smallest curvature: " << vertices[smallestCurvature] << std::endl;
             if (!removeVertex(smallestCurvature))
             {
+                // debug - write the mesh to a file
+                writeRepairedMeshTri("removed");
+                std::cout << "backtracking" << std::endl;
                 // if we can't remove the vertex then we need to backtrack
                 backtrack();
                 currentVertex++;
                 smallestCurvature = findSmallestCurvature(currentVertex);
+                // debug - write the mesh to a file
+                writeRepairedMeshTri("de-removed");
+                exit(0);
             } else
             {
                 removed = true;
@@ -67,49 +82,70 @@ void Simplification::backtrack()
 
 bool Simplification::removeVertex(int vertexIndex)
 {
+    // store the vertex that is being removed
+    removedVertex = vertices[vertexIndex];
     holeEdges.clear();
     // remove the vertex from the mesh
     // remove the vertex from the vertices vector
     vertices.erase(vertices.begin() + vertexIndex);
     // remove any faces that contain the vertex, and add the edges of the hole to the holeEdges vector
-    for (auto &face: faces)
+    for (int i = 0; i < faces.size(); i++)
     {
+        Face face = faces[i];
         if (face[0] == vertexIndex)
         {
             holeEdges.push_back({face[1], face[2]});
             // remove the face
-            face = faces.back();
+            faces[i] = faces.back();
             faces.pop_back();
+            i--;
         } else if (face[1] == vertexIndex)
         {
-            holeEdges.push_back({face[0], face[2]});
+            holeEdges.push_back({face[2], face[0]});
             // remove the face
-            face = faces.back();
+            faces[i] = faces.back();
             faces.pop_back();
+            i--;
         } else if (face[2] == vertexIndex)
         {
             holeEdges.push_back({face[0], face[1]});
             // remove the face
-            face = faces.back();
+            faces[i] = faces.back();
             faces.pop_back();
-        } else
+            i--;
+        }
+        else
         {
             // subtract the vertex index in the faces by 1 if it is greater than the removed vertex
             if (face[0] > vertexIndex)
             {
-                face[0]--;
+                faces[i][0]--;
             }
             if (face[1] > vertexIndex)
             {
-                face[1]--;
+                faces[i][1]--;
             }
             if (face[2] > vertexIndex)
             {
-                face[2]--;
+                faces[i][2]--;
             }
         }
     }
+    // subtract the vertex indices in the holeEdges by 1 if they are greater than the removed vertex
+    for (auto &edge: holeEdges)
+    {
+        if (edge.start > vertexIndex)
+        {
+            edge.start--;
+        }
+        if (edge.end > vertexIndex)
+        {
+            edge.end--;
+        }
+
+    }
     int previousFaces = (int) faces.size();
+    std::cout << "filling hole with " << holeEdges.size() << " edges" << std::endl;
     // triangulate the hole
     triangulateHole(holeEdges);
     facesAdded = (int) faces.size() - previousFaces;
@@ -121,6 +157,7 @@ bool Simplification::removeVertex(int vertexIndex)
 
 float Simplification::findCurvature(int vertexIndex)
 {
+    return findMeanCurvature(vertexIndex);
     // get the mean and gaussian curvature
     float meanCurvature = findMeanCurvature(vertexIndex);
     float gaussianCurvature = findGaussianCurvature(vertexIndex);
@@ -150,7 +187,7 @@ float Simplification::findGaussianCurvature(int vertexIndex)
     // get the one ring vertices
     std::vector<int> oneRingVertices = getOneRingVertices(vertexIndex);
     // get the angles around the vertex
-    float sumOfAngles = 0;
+    float sumOfAngles = 0.f;
     for (int i = 0; i < oneRingVertices.size(); i++)
     {
         // get the two edge vectors, both coming from the vertex
@@ -160,11 +197,8 @@ float Simplification::findGaussianCurvature(int vertexIndex)
         sumOfAngles += getAngleBetweenVectors(edge1, edge2);
     }
 
-    // get the area of the vertex
-    float Ai = getAreaOfVertex(oneRingVertices, vertexIndex);
-
     // return the gaussian curvature
-    return (2 * M_PI - sumOfAngles) * Ai;
+    return (float) (2.f * M_PI - sumOfAngles);
 }
 
 
@@ -187,8 +221,8 @@ void Simplification::triangulateHole(std::vector<Edge> &boundary)
             }
         }
     }
-    // while the boundary has more than 3 edges
-    while (boundary.size() > 3)
+    // while the boundary has more than 2 edges
+    while (orderedBoundary.size() > 3)
     {
         // get the two edges that form the smallest angle
         int smallestAngleIndex = findSmallestAngle(orderedBoundary);
@@ -196,11 +230,12 @@ void Simplification::triangulateHole(std::vector<Edge> &boundary)
         Edge smallestAngleEdge2 = orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()];
         // add the triangle to the faces
         faces.push_back({smallestAngleEdge1.start, smallestAngleEdge1.end, smallestAngleEdge2.end});
-        // remove the edges from the boundary
+        // remove the edges from the boundary and add the new edge
+        // we need to maintain the order of the boundary, so we remove one edge and swap the other with the new edge
+        // swap the new edge in with the second edge
+        orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()] = {smallestAngleEdge1.start, smallestAngleEdge2.end};
+        // remove the first edge
         orderedBoundary.erase(orderedBoundary.begin() + smallestAngleIndex);
-        orderedBoundary.erase(orderedBoundary.begin() + smallestAngleIndex);
-        // add the new edge to the boundary
-        orderedBoundary.push_back({smallestAngleEdge1.start, smallestAngleEdge2.end});
     }
     // add the last triangle
     faces.push_back({orderedBoundary[0].start, orderedBoundary[0].end, orderedBoundary[1].end});
@@ -218,7 +253,10 @@ int Simplification::findSmallestAngle(const std::vector<Edge> &boundary)
         // get the two edges
         Edge edge1 = boundary[i];
         Edge edge2 = boundary[(i + 1) % boundary.size()];
-        float angleBetween = getAngleBetweenEdges(edge1, edge2);
+        // reverse the edges to test the angle in the other direction
+        Edge edge1Reverse = {edge1.end, edge1.start};
+        Edge edge2Reverse = {edge2.end, edge2.start};
+        float angleBetween = getAngleBetweenEdges(edge1Reverse, edge2Reverse);
         // if the angle between the two edges is smaller than the smallest angle, then update the smallest angle
         if (angleBetween < smallestAngle)
         {
@@ -246,10 +284,24 @@ float Simplification::getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vect
     return std::acos(dotProduct(vector1, vector2) / (vector1.length() * vector2.length()));
 }
 
-float Simplification::getAreaOfVertex(std::vector<int> vector1, int index)
+bool Simplification::isEulerian()
 {
-    // TODO: implement this
-    return 0;
+    return true;
 }
+
+std::vector<int> Simplification::getOneRingVertices(int vertexIndex)
+{
+    // get the one ring edges
+    std::vector<Edge> oneRing = getOneRing(vertexIndex);
+    // get the one ring vertices (the start of each edge)
+    std::vector<int> oneRingVertices;
+    for (auto &edge: oneRing)
+    {
+        oneRingVertices.push_back(edge.start);
+    }
+    return oneRingVertices;
+}
+
+
 
 

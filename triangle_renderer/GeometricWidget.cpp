@@ -59,7 +59,7 @@ void GeometricWidget::initializeGL()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
 
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_FACE);
 	
 	// background is pink
 	glClearColor(1.0, 0.7, 0.7, 1.0);

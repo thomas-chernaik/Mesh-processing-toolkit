@@ -6,6 +6,7 @@
 #define MODELLINGCWK1_SIMPLIFICATION_H
 
 #include "MeshRepair.h"
+#include "../triangle_renderer/Cartesian3.h"
 
 class Simplification : public MeshRepair
 {
@@ -31,9 +32,6 @@ private:
     // method to get the vertices in the one ring of a vertex
     std::vector<int> getOneRingVertices(int vertexIndex);
 
-    // method to get the normal of a vertex
-    Cartesian3 getNormal(int vertexIndex);
-
     // method to get the angle between two vectors
     float getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vector2);
 
@@ -50,6 +48,7 @@ private:
 
 
 
+    // method to test if the eulerian condition is maintained
     bool isEulerian();
 
     // stuff we need to be able to backtrack if we lose the eulerian condition
@@ -61,7 +60,6 @@ private:
     Vertex removedVertex;
     void backtrack();
 
-    float getAreaOfVertex(std::vector<int> vector1, int index);
 };
 
 

@@ -1,0 +1,1 @@
+I have used the quadratic equation to combine the mean and gaussian curvatures to get kappa1 and kappa2. These are the curvature values (precisely the larger of the two) that I use to determine the smallest curvature vertex to remove.
