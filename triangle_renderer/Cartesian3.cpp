@@ -70,6 +70,12 @@ float Cartesian3::length()
 	return (x*x + y*y + z*z);	
 	} // Cartesian3::length()
 
+// routine to find the length with square root
+float Cartesian3::lengthSqrt()
+    { // Cartesian3::lengthSqrt()
+    return sqrt(x*x + y*y + z*z);
+    } // Cartesian3::lengthSqrt()
+
 // normalisation routine
 Cartesian3 Cartesian3::normalise()
 	{ // Cartesian3::normalise()

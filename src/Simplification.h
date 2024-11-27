@@ -5,17 +5,25 @@
 #ifndef MODELLINGCWK1_SIMPLIFICATION_H
 #define MODELLINGCWK1_SIMPLIFICATION_H
 
+#include <unordered_map>
 #include "MeshRepair.h"
 #include "../triangle_renderer/Cartesian3.h"
+#include <unordered_set>
 
 class Simplification : public MeshRepair
 {
 public:
     // method to simplify the mesh
-    void simplifyMesh();
+    void simplifyMesh(int maxIterations);
 private:
     // method to find the vertex with the nth smallest curvature
     int findSmallestCurvature(int n);
+
+    // method to generate a vector of all the curvatures
+    void generateCurvatures();
+
+    // method to update the curvatures vector
+    void updateCurvatures();
 
     // method to find the mean/gaussian curvature of a vertex
     float findCurvature(int vertexIndex);
@@ -48,6 +56,7 @@ private:
 
 
 
+
     // method to test if the eulerian condition is maintained
     bool isEulerian();
 
@@ -56,10 +65,26 @@ private:
     int facesAdded;
     // the edges of the hole we just filled
     std::vector<Edge> holeEdges;
+    // the (former) faces of the hole we just created, as a set for O(1) lookup
+    std::unordered_set<int> holeFaces;
     // the removed vertex
     Vertex removedVertex;
+    int removedVertexIndex;
     void backtrack();
 
+    // method to clean up non-manifold edges
+    void cleanUpNonManifoldEdges();
+
+
+    // dictionary of curvatures - key is the vertex index, value is the curvature
+    std::unordered_map<int, float> curvatures;
+
+    Cartesian3 getHoleNormal(std::vector<Edge> boundary);
+
+    int getConcaveEdge(std::vector<Edge> boundary, Cartesian3 boundaryNormal);
+
+    // the starting genus to check the eulerian condition against
+    int startingGenus;
 };
 
 

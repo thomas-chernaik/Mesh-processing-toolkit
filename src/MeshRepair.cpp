@@ -217,6 +217,14 @@ void MeshRepair::fillHole(const std::vector<Edge> &boundary)
     }
     // get the centre of gravity of the boundary
     Vertex centreOfGravity = getCentreOfGravity(boundaryVertices);
+    // -- below didn't work and is a hack anyway --
+//    // get the normal of the boundary (approx will do so just use two edges)
+//    Cartesian3 normal = (vertices[boundary[0].start] - vertices[boundary[0].end]).cross(vertices[boundary[1].end] - vertices[boundary[1].start]).normalise();
+//    normal = normal * 0.0001f;
+//    // add the normal * 0.1 to the centre of gravity to get the centre of the face
+//    // this is to avoid the face being coplanar with the boundary which can result in self intersections
+//    centreOfGravity = Vertex(centreOfGravity.x + normal.x, centreOfGravity.y + normal.y, centreOfGravity.z + normal.z);
+    // -- to here --
     // add the centre of gravity to the vertices
     vertices.push_back(centreOfGravity);
     // get the index of the centre of gravity
@@ -336,7 +344,7 @@ float MeshRepair::getAngleBetweenEdges(Edge edge1, Edge edge2)
     // use the dot product to find the angle between two vectors without acos
     Cartesian3 edge1Vector = vertices[edge1.end] - vertices[edge1.start];
     Cartesian3 edge2Vector = vertices[edge2.start] - vertices[edge2.end];
-    auto result = (float) -(dotProduct(edge1Vector, edge2Vector) / (edge1Vector.length() * edge2Vector.length()));
+    auto result = (float) -(dotProduct(edge1Vector, edge2Vector) / (edge1Vector.lengthSqrt() * edge2Vector.lengthSqrt()));
     // test if the angle is reflex, if it is we want to return the -result + 2
     if (isReflexAngle(edge1, edge2))
     {
@@ -400,6 +408,7 @@ bool MeshRepair::isReflexAngle(Edge edge1, Edge edge2)
     }
     if (thirdPoint == -1)
     {
+
         std::cerr << "Failed to find the third point of the face" << std::endl;
         exit(-4);
     }

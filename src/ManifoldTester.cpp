@@ -282,7 +282,7 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
 
 
     // check if the two faces are parallel
-    if (face1Normal.cross(face2Normal).length() < e)
+    if (face1Normal.cross(face2Normal).lengthSqrt() < e)
     {
         // we have an earlier test for them being coplanar
         // if they are parallel then they don't intersect

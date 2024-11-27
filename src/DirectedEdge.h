@@ -31,6 +31,9 @@ public:
 
 protected:
 
+    // function used as debug to write the file to an obj file
+    void writeObjFile(const std::string& filename);
+
     // called to compute the directed edges from the indexed faces
     void constructDirectedEdges();
 

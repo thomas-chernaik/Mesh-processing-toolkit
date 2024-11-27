@@ -115,6 +115,7 @@ void DirectedEdge::readFile(const std::string& filename)
 
 void DirectedEdge::constructDirectedEdges()
 {
+    std::cout << "Constructing the directed edges and other halves for the whole mesh, which may take a few seconds for large meshes" << std::endl;
     // start a timer
     auto start = std::chrono::high_resolution_clock::now();
     // clear the directed edges and other half vectors
@@ -162,9 +163,10 @@ void DirectedEdge::constructDirectedEdges()
     // stop the timer
     auto stop = std::chrono::high_resolution_clock::now();
     // output the time taken
-    std::cout << "Directed edges took "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
-              << " milliseconds" << std::endl;
+//    std::cout << "Directed edges took "
+//              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+//              << " milliseconds" << std::endl;
+
 
     start = std::chrono::high_resolution_clock::now();
     // for each edge
@@ -212,9 +214,9 @@ void DirectedEdge::constructDirectedEdges()
     // stop the timer
     stop = std::chrono::high_resolution_clock::now();
     // output the time taken
-    std::cout << "Other half edges took "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
-              << " milliseconds" << std::endl;
+//    std::cout << "Other half edges took "
+//              << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+//              << " milliseconds" << std::endl;
 }
 
 void DirectedEdge::writeFile(const std::string& filename)
@@ -264,5 +266,32 @@ void DirectedEdge::writeFile(const std::string& filename)
     {
         fileWriter << "OtherHalf " << edgeIndex << "  " << otherHalf[edgeIndex] << "\n";
     }
+
+}
+
+void DirectedEdge::writeObjFile(const std::string &filename)
+{
+    // open the file to write
+    std::ofstream fileWriter(filename + ".obj");
+    if (!fileWriter.is_open())
+    {
+        std::cerr << "Failed to write to " << filename << ".obj" << std::endl;
+        exit(-6);
+    }
+
+    std::cout << "Writing the mesh to a .obj file" << std::endl;
+    // write the vertices in
+    for (auto & vertice : vertices)
+    {
+        fileWriter << "v " << vertice.x << " " << vertice.y << " " << vertice.z << "\n";
+    }
+    // write the faces in
+    for (auto & face : faces)
+    {
+        fileWriter << "f " << face[0] + 1 << " " << face[1] + 1 << " " << face[2] + 1 << "\n";
+    }
+    // close the file
+    fileWriter.close();
+    std::cout << "Successfully wrote the mesh to " << filename << ".obj" << std::endl;
 
 }

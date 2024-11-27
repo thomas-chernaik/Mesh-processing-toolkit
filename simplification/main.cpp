@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     std::string filenameWithoutExtension;
     std::string filename;
     // if we have an argument, then we use that as the file name to convert, otherwise we prompt the user
-    if (argc == 2)
+    if (argc == 2 || argc == 3)
     {
         filename = argv[1];
     } else if (argc == 1)
@@ -31,6 +31,16 @@ int main(int argc, char **argv)
     {
         std::cerr << "Please enter at most one command line argument." << std::endl;
         return -1;
+    }
+    int maxIterations = 0;
+    if (argc == 3)
+    {
+        maxIterations = std::stoi(argv[2]);
+    }
+    else
+    {
+        std::cout << "Please enter the maximum number of iterations to simplify the mesh: " << std::endl;
+        std::cin >> maxIterations;
     }
 
     // find the file type from the file name
@@ -96,21 +106,24 @@ int main(int argc, char **argv)
         smp.readFile(filename);
     }
     // simplify the mesh
-    smp.simplifyMesh();
+    smp.simplifyMesh(maxIterations);
     // write the repaired mesh to the same filetype as the input
     filenameWithoutExtension = filenameWithoutExtension + "_simplified";
-    switch (fileType)
-    {
-        case TRI:
-            smp.writeRepairedMeshTri(filenameWithoutExtension);
-            break;
-        case FACE:
-            smp.writeRepairedMeshFace(filenameWithoutExtension);
-            break;
-        case DIREDGE:
-            smp.writeFile(filenameWithoutExtension);
-            break;
-    }
+    smp.writeRepairedMeshTri(filenameWithoutExtension);
+//
+// because of the nature of operations on the mesh, the mesh is always written as a .tri file for now
+//    switch (fileType)
+//    {
+//        case TRI:
+//            smp.writeRepairedMeshTri(filenameWithoutExtension);
+//            break;
+//        case FACE:
+//            smp.writeRepairedMeshFace(filenameWithoutExtension);
+//            break;
+//        case DIREDGE:
+//            smp.writeFile(filenameWithoutExtension);
+//            break;
+//    }
 
     return 0;
 }

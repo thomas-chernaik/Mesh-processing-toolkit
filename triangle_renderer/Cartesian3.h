@@ -47,6 +47,9 @@ class Cartesian3
 	
 	// routine to find the length
 	float length();
+
+    // routine to find the length with sqrt
+    float lengthSqrt();
 	
 	// normalisation routine
 	Cartesian3 normalise();

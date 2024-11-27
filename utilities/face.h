@@ -30,7 +30,9 @@ struct Face
     }
     bool operator==(const Face &other) const
     {
-        return vertex1 == other.vertex1 && vertex2 == other.vertex2 && vertex3 == other.vertex3;
+        return (vertex1 == other.vertex1 && vertex2 == other.vertex2 && vertex3 == other.vertex3) ||
+               (vertex1 == other.vertex2 && vertex2 == other.vertex3 && vertex3 == other.vertex1) ||
+               (vertex1 == other.vertex3 && vertex2 == other.vertex1 && vertex3 == other.vertex2);
     }
 };
 

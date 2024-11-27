@@ -14,6 +14,10 @@ struct Edge
     {
         return (start == other.start && end == other.end) || (start == other.end && end == other.start);
     }
+    bool exactlyEqual(const Edge &other) const
+    {
+        return start == other.start && end == other.end;
+    }
 };
 
 #endif //MODELLINGCWK1_EDGE_H

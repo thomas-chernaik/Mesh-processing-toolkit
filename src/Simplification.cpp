@@ -6,19 +6,36 @@
 #include <cmath>
 #include "Simplification.h"
 
-void Simplification::simplifyMesh()
+void Simplification::simplifyMesh(int maxIterations)
 {
     // TODO: work out exit conditions
     //  for now, if there is no vertex that can be removed without breaking the eulerian condition, then we exit
-    bool removed = true;
-    for (int i = 0; i < 1000; i++)
+    bool removed;
+    curvatures.clear();
+    // add the whole mesh to the component - every face
+    components.emplace_back();
+    components[0].resize(faces.size());
+    for (int i = 0; i < faces.size(); i++)
     {
+        components[0][i] = i;
+    }
+    startingGenus = CalculateGenus()[0];
+//    std::cout << "Starting genus: " << startingGenus << std::endl;
+    // generate the set of curvatures
+    generateCurvatures();
+    for (int i = 0; i < maxIterations; i++)
+    {
+        //cleanUpNonManifoldEdges();
         // -debug - write the mesh to a file with the iteration number
-        // if its a multiple of 10
-        if (i % 10 == 0)
-        {
-            //writeRepairedMeshTri("iteration" + std::to_string(i));
-        }
+//        // if its a multiple of 100
+//        if (i % 1000 == 0)
+//            writeObjFile("iteration" + std::to_string(i));
+//        if (i == 11536)
+//            writeRepairedMeshTri("iteration" + std::to_string(i));
+
+        std::cout << "Iteration " << i << std::endl;
+
+
         //writeRepairedMeshTri("iteration" + std::to_string(i));
         removed = false;
         int currentVertex = 0;
@@ -27,55 +44,110 @@ void Simplification::simplifyMesh()
         while (!removed && currentVertex < vertices.size())
         {
             std::cout << "Smallest curvature: " << vertices[smallestCurvature] << std::endl;
-            if (!removeVertex(smallestCurvature))
+            try
             {
-                // debug - write the mesh to a file
-                writeRepairedMeshTri("removed");
-                std::cout << "backtracking" << std::endl;
-                // if we can't remove the vertex then we need to backtrack
-                backtrack();
-                currentVertex++;
-                smallestCurvature = findSmallestCurvature(currentVertex);
-                // debug - write the mesh to a file
-                writeRepairedMeshTri("de-removed");
-                exit(0);
-            } else
+                if (!removeVertex(smallestCurvature))
+                {
+                    std::cout << "backtracking" << std::endl;
+                    // if we can't remove the vertex then we need to backtrack
+                    backtrack();
+                    currentVertex++;
+                    smallestCurvature = findSmallestCurvature(currentVertex);
+                } else
+                {
+                    removed = true;
+                    // update the curvatures
+                    updateCurvatures();
+                }
+            }
+            catch(std::exception &e)
             {
-                removed = true;
+                std::cout << "Cannot continue simplification because of error: " << e.what() << std::endl;
+                cleanUpNonManifoldEdges();
+                //writeObjFile("final");
+                return;
             }
         }
+        // update the component
+        // remove the faces in holeFaces from the component
+        int numRemoved = 0;
+        for(int j = 0; j < components.size(); j++)
+        {
+            // if the component is in hole faces, swap it with the last - numRemoved component
+            if (holeFaces.find(j - numRemoved) != holeFaces.end())
+            {
+                std::swap(components[j - numRemoved], components[components.size() - numRemoved - 1]);
+                numRemoved++;
+            }
+
+        }
+        // remove the last numRemoved components
+        components.resize(components.size() - numRemoved);
+        // now add in the new faces
+        // these are faces indexed at the end of the faces vector, so faces.size() - facesAdded to faces.size()
+        for(int j = faces.size() - facesAdded; j < faces.size(); j++)
+        {
+            components[0].push_back(j);
+        }
+
+
     }
+    // -debug - write an obj file
+    cleanUpNonManifoldEdges();
+    //writeObjFile("final");
 }
 
 int Simplification::findSmallestCurvature(int n)
 {
-    // find the nth smallest curvature
-    std::vector<float> curvatures;
-    std::vector<int> vertexIndices;
-    for (int i = 0; i < vertices.size(); i++)
+    if(n == 0)
     {
-        curvatures.push_back(findCurvature(i));
-        vertexIndices.push_back(i);
+        // return the smallest curvature
+        // get the key of the minimum value in curvatures
+        int minElement = -1;
+        float minValue = std::numeric_limits<float>::max();
+        // iterate across the curvatures dictionary
+        for (auto &curvature: curvatures)
+        {
+            // if the curvature is less than the current minimum value
+            if (curvature.second < minValue)
+            {
+                // set the minimum value to the curvature
+                minValue = curvature.second;
+                // set the minimum element to the key
+                minElement = curvature.first;
+            }
+        }
+        return minElement;
     }
-    // sort the vertices by curvature
-    std::sort(vertexIndices.begin(), vertexIndices.end(), [&curvatures](int a, int b)
+    // return the nth smallest curvature
+    // get the curvatures in a vector
+    std::vector<float> curvaturesVector;
+    curvaturesVector.reserve(curvatures.size());
+    std::vector<float> curvaturesIndices;
+    curvaturesIndices.reserve(curvatures.size());
+    for (auto &curvature: curvatures)
     {
-        return curvatures[a] < curvatures[b];
+        curvaturesVector.push_back(curvature.second);
+        curvaturesIndices.push_back(curvature.first);
+    }
+    // sort the indices by the curvatures
+    std::sort(curvaturesIndices.begin(), curvaturesIndices.end(), [&curvaturesVector](int i1, int i2)
+    {
+        return curvaturesVector[i1] < curvaturesVector[i2];
     });
-    return vertexIndices[n];
+    // return the nth smallest curvature
+    return curvaturesIndices[n];
+
 }
 
 void Simplification::backtrack()
 {
     // remove the last added faces
     faces.resize(faces.size() - facesAdded);
-    // add the removed vertex back
-    vertices.push_back(removedVertex);
-    int vertexIndex = (int) vertices.size() - 1;
     // add the removed faces back
     for (auto &edge: holeEdges)
     {
-        faces.push_back({edge.start, edge.end, vertexIndex});
+        faces.push_back({edge.start, edge.end, removedVertexIndex});
     }
 
 }
@@ -83,17 +155,17 @@ void Simplification::backtrack()
 bool Simplification::removeVertex(int vertexIndex)
 {
     // store the vertex that is being removed
-    removedVertex = vertices[vertexIndex];
+    removedVertexIndex = vertexIndex;
     holeEdges.clear();
-    // remove the vertex from the mesh
-    // remove the vertex from the vertices vector
-    vertices.erase(vertices.begin() + vertexIndex);
+    holeFaces.clear();
+    int faceIndex = 0;
     // remove any faces that contain the vertex, and add the edges of the hole to the holeEdges vector
     for (int i = 0; i < faces.size(); i++)
     {
         Face face = faces[i];
         if (face[0] == vertexIndex)
         {
+            holeFaces.insert(faceIndex);
             holeEdges.push_back({face[1], face[2]});
             // remove the face
             faces[i] = faces.back();
@@ -101,6 +173,7 @@ bool Simplification::removeVertex(int vertexIndex)
             i--;
         } else if (face[1] == vertexIndex)
         {
+            holeFaces.insert(faceIndex);
             holeEdges.push_back({face[2], face[0]});
             // remove the face
             faces[i] = faces.back();
@@ -108,41 +181,14 @@ bool Simplification::removeVertex(int vertexIndex)
             i--;
         } else if (face[2] == vertexIndex)
         {
+            holeFaces.insert(faceIndex);
             holeEdges.push_back({face[0], face[1]});
             // remove the face
             faces[i] = faces.back();
             faces.pop_back();
             i--;
         }
-        else
-        {
-            // subtract the vertex index in the faces by 1 if it is greater than the removed vertex
-            if (face[0] > vertexIndex)
-            {
-                faces[i][0]--;
-            }
-            if (face[1] > vertexIndex)
-            {
-                faces[i][1]--;
-            }
-            if (face[2] > vertexIndex)
-            {
-                faces[i][2]--;
-            }
-        }
-    }
-    // subtract the vertex indices in the holeEdges by 1 if they are greater than the removed vertex
-    for (auto &edge: holeEdges)
-    {
-        if (edge.start > vertexIndex)
-        {
-            edge.start--;
-        }
-        if (edge.end > vertexIndex)
-        {
-            edge.end--;
-        }
-
+        faceIndex++;
     }
     int previousFaces = (int) faces.size();
     std::cout << "filling hole with " << holeEdges.size() << " edges" << std::endl;
@@ -157,7 +203,7 @@ bool Simplification::removeVertex(int vertexIndex)
 
 float Simplification::findCurvature(int vertexIndex)
 {
-    return findMeanCurvature(vertexIndex);
+    return findGaussianCurvature(vertexIndex);
     // get the mean and gaussian curvature
     float meanCurvature = findMeanCurvature(vertexIndex);
     float gaussianCurvature = findGaussianCurvature(vertexIndex);
@@ -177,7 +223,7 @@ float Simplification::findMeanCurvature(int vertexIndex)
     // get the discrete laplace beltrami operator
     Cartesian3 laplaceBeltrami = computeLaplaceBeltrami(vertexIndex);
     // the mean curvature is half the magnitude of the laplace beltrami operator
-    return laplaceBeltrami.length() / 2;
+    return laplaceBeltrami.lengthSqrt() / 2;
 }
 
 float Simplification::findGaussianCurvature(int vertexIndex)
@@ -185,7 +231,33 @@ float Simplification::findGaussianCurvature(int vertexIndex)
     // this is the "angular deficit"
     // its equal to 1 / Ai (what is Ai?) * (2pi - sum of angles around the vertex)
     // get the one ring vertices
-    std::vector<int> oneRingVertices = getOneRingVertices(vertexIndex);
+    //std::vector<int> oneRingVertices = getOneRingVertices(vertexIndex);
+    // -debug test
+    // get the one ring edges
+    std::vector<Edge> oneRingEdges = getOneRing(vertexIndex);
+    // order the one ring edges
+    std::vector<Edge> orderedOneRingEdges;
+    orderedOneRingEdges.push_back(oneRingEdges[0]);
+    while (orderedOneRingEdges.size() < oneRingEdges.size())
+    {
+        // get the last vertex of the last edge in the ordered boundary
+        int lastVertex = orderedOneRingEdges.back().end;
+        // find the next edge that has the last vertex as the start
+        for (auto &edge: oneRingEdges)
+        {
+            if (edge.start == lastVertex)
+            {
+                orderedOneRingEdges.push_back(edge);
+                break;
+            }
+        }
+    }
+    // get the first vertex of each edge
+    std::vector<int> oneRingVertices;
+    for (auto &edge: orderedOneRingEdges)
+    {
+        oneRingVertices.push_back(edge.start);
+    }
     // get the angles around the vertex
     float sumOfAngles = 0.f;
     for (int i = 0; i < oneRingVertices.size(); i++)
@@ -196,9 +268,20 @@ float Simplification::findGaussianCurvature(int vertexIndex)
         // get the angle between the two edges
         sumOfAngles += getAngleBetweenVectors(edge1, edge2);
     }
-
+//    // if the sum of the angles is greater than 2pi then smth went wrong
+//    if (sumOfAngles >= 2.f * M_PI + 0.01f)
+//    {
+//        std::cerr << "Sum of angles is greater than 2pi around vertex " << vertexIndex << " : " << vertices[vertexIndex]
+//                  << std::endl;
+//        // output the one ring vertices
+//        for (auto &vertex: oneRingVertices)
+//        {
+//            std::cout << vertices[vertex] << std::endl;
+//        }
+//        exit(-3);
+//    }
     // return the gaussian curvature
-    return (float) (2.f * M_PI - sumOfAngles);
+    return std::abs(2.f * M_PI - sumOfAngles);
 }
 
 
@@ -221,21 +304,56 @@ void Simplification::triangulateHole(std::vector<Edge> &boundary)
             }
         }
     }
-    // while the boundary has more than 2 edges
+//    // do a fan triangulation
+//    for(int i = 1; i < orderedBoundary.size() - 1; i++)
+//    {
+//        faces.push_back({orderedBoundary[0].start, orderedBoundary[i].start, orderedBoundary[i + 1].start});
+//    }
+//    return;
+    // compute the normal of the hole
+    Cartesian3 holeNormal = getHoleNormal(orderedBoundary);
+    // while the boundary has more than 3 edges
     while (orderedBoundary.size() > 3)
     {
-        // get the two edges that form the smallest angle
-        int smallestAngleIndex = findSmallestAngle(orderedBoundary);
-        Edge smallestAngleEdge1 = orderedBoundary[smallestAngleIndex];
-        Edge smallestAngleEdge2 = orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()];
+        // get two edges that aren't reflex angles
+        int goodEdgeIndex = getConcaveEdge(orderedBoundary, holeNormal);
+        // get the two edges
+        Edge edge1 = orderedBoundary[goodEdgeIndex];
+        Edge edge2 = orderedBoundary[(goodEdgeIndex + 1) % orderedBoundary.size()];
         // add the triangle to the faces
-        faces.push_back({smallestAngleEdge1.start, smallestAngleEdge1.end, smallestAngleEdge2.end});
+        faces.push_back({edge1.start, edge1.end, edge2.end});
         // remove the edges from the boundary and add the new edge
         // we need to maintain the order of the boundary, so we remove one edge and swap the other with the new edge
         // swap the new edge in with the second edge
-        orderedBoundary[(smallestAngleIndex + 1) % orderedBoundary.size()] = {smallestAngleEdge1.start, smallestAngleEdge2.end};
+        orderedBoundary[(goodEdgeIndex + 1) % orderedBoundary.size()] = {edge1.start, edge2.end};
         // remove the first edge
-        orderedBoundary.erase(orderedBoundary.begin() + smallestAngleIndex);
+        orderedBoundary.erase(orderedBoundary.begin() + goodEdgeIndex);
+    }
+    // make sure the last triangle is in fact a triangle
+    if (orderedBoundary[0].end != orderedBoundary[1].start || orderedBoundary[1].end != orderedBoundary[2].start ||
+        orderedBoundary[2].end != orderedBoundary[0].start)
+    {
+        throw std::runtime_error("Last triangle is not a triangle");
+    }
+    // make sure the last triangle isn't degenerate
+    // if any of the start vertices are the same then we have a degenerate triangle
+    if (orderedBoundary[0].start == orderedBoundary[1].start || orderedBoundary[1].start == orderedBoundary[2].start ||
+        orderedBoundary[2].start == orderedBoundary[0].start)
+    {
+        throw std::runtime_error("Last triangle is degenerate");
+    }
+    // make sure the last triangle isn't a duplicate of an existing face
+    for (auto &face: faces)
+    {
+        if ((face[0] == orderedBoundary[0].start && face[1] == orderedBoundary[1].start &&
+             face[2] == orderedBoundary[2].start) ||
+            (face[0] == orderedBoundary[1].start && face[1] == orderedBoundary[2].start &&
+             face[2] == orderedBoundary[0].start) ||
+            (face[0] == orderedBoundary[2].start && face[1] == orderedBoundary[0].start &&
+             face[2] == orderedBoundary[1].start))
+        {
+            throw std::runtime_error("Last triangle is a duplicate");
+        }
     }
     // add the last triangle
     faces.push_back({orderedBoundary[0].start, orderedBoundary[0].end, orderedBoundary[1].end});
@@ -281,25 +399,296 @@ Cartesian3 Simplification::computeLaplaceBeltrami(int vertexIndex)
 float Simplification::getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vector2)
 {
     // the angle between two vectors is the acos of the dot product of the two vectors divided by the product of their magnitudes
-    return std::acos(dotProduct(vector1, vector2) / (vector1.length() * vector2.length()));
+    return std::acos(dotProduct(vector1, vector2) / (vector1.lengthSqrt() * vector2.lengthSqrt()));
 }
 
 bool Simplification::isEulerian()
 {
+    return true;
+    // here we check that the mesh is manifold
+    // first we check that the eulerian condition is satisfied.
+    // test the genus of the mesh on component 0
+    int genus = CalculateGenus()[0];
+    // if the genus is not the same as the starting genus then the mesh is not eulerian
+    if (genus != startingGenus)
+    {
+        std::cerr << "Genus is not the same as the starting genus" << std::endl;
+        //exit(-2);
+        return false;
+    }
     return true;
 }
 
 std::vector<int> Simplification::getOneRingVertices(int vertexIndex)
 {
     // get the one ring edges
-    std::vector<Edge> oneRing = getOneRing(vertexIndex);
-    // get the one ring vertices (the start of each edge)
+    std::vector<Edge> oneRingEdges = getOneRing(vertexIndex);
+    // get the one ring vertices
     std::vector<int> oneRingVertices;
-    for (auto &edge: oneRing)
+    for (auto &edge: oneRingEdges)
     {
-        oneRingVertices.push_back(edge.start);
+        oneRingVertices.push_back(edge.end);
     }
     return oneRingVertices;
+//
+//    std::vector<int> oneRing;
+//    // the first one ring vertex is the other side of the first directed edge from the vertex
+//    int firstDirectedEdge = directedEdges[vertexIndex];
+//    int faceIndex = firstDirectedEdge / 3;
+//    oneRing.push_back(faces[faceIndex][(firstDirectedEdge + 1) % 3]);
+//    // get the other half of the directed edge
+//    int otherHalfIndex = otherHalf[firstDirectedEdge];
+//    // get the next edge in the face
+//    int otherHalfFaceIndex = otherHalfIndex / 3;
+//    int otherHalfVertexIndex = ((otherHalfIndex % 3) + 1) % 3;
+//    otherHalfIndex = otherHalfFaceIndex * 3 + otherHalfVertexIndex;
+//    while (otherHalfIndex != firstDirectedEdge)
+//    {
+//        // get the vertex index
+//        int vertex = faces[otherHalfFaceIndex][(otherHalfVertexIndex + 1) % 3];
+//        // -debug-
+//        // if the vertex without + 1 isn't the vertex index then we have a problem
+//        if (faces[otherHalfFaceIndex][otherHalfVertexIndex] != vertexIndex)
+//        {
+//            throw std::runtime_error("Vertex index doesn't match");
+//        }
+//        // add the vertex to the one ring
+//        oneRing.push_back(vertex);
+//        // get the next directed edge
+//        otherHalfIndex = otherHalf[otherHalfIndex];
+//        // get the next edge in the face
+//        otherHalfFaceIndex = otherHalfIndex / 3;
+//        otherHalfVertexIndex = ((otherHalfIndex % 3) + 1) % 3;
+//        otherHalfIndex = otherHalfFaceIndex * 3 + otherHalfVertexIndex;
+//    }
+//    return oneRing;
+}
+
+void Simplification::generateCurvatures()
+{
+    // loop through each vertex and get the curvature
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        curvatures[i] = findCurvature(i);
+    }
+}
+
+void Simplification::updateCurvatures()
+{
+    // remove the curvature for the removed vertex
+    curvatures.erase(removedVertexIndex);
+    // update the curvatures for the vertices that have been affected by the removal
+    // these are the vertices in the one ring of the removed vertex - stored in holeEdges - precisely the start of each edge
+    for (auto &edge: holeEdges)
+    {
+        curvatures[edge.start] = findCurvature(edge.start);
+    }
+}
+
+Cartesian3 Simplification::getHoleNormal(std::vector<Edge> boundary)
+{
+    Cartesian3 normal = {0, 0, 0};
+    // for each edge in the boundary
+    for (int i = 0; i < boundary.size(); i++)
+    {
+        // get the two vectors
+        Cartesian3 edge1 = vertices[boundary[i].start] - vertices[boundary[i].end];
+        Cartesian3 edge2 = vertices[boundary[(i + 1) % boundary.size()].end] - vertices[boundary[(i + 1) % boundary.size()].start];
+        // get the normal of the two vectors
+        Cartesian3 faceNormal = edge1.cross(edge2);
+        // add the normal to the total normal
+        normal = normal + faceNormal.normalise();
+    }
+    // don't need to normalise since we only need the direction
+    return normal.normalise();
+}
+
+int Simplification::getConcaveEdge(std::vector<Edge> boundary, Cartesian3 boundaryNormal)
+{
+    // for each edge in the boundary
+    for (int i = 0; i < boundary.size(); i++)
+    {
+        // get the two edges
+        Edge edge1 = boundary[i];
+        Edge edge2 = boundary[(i + 1) % boundary.size()];
+        // get the two vectors
+        Cartesian3 vector1 = vertices[edge1.start] - vertices[edge1.end];
+        Cartesian3 vector2 = vertices[edge2.end] - vertices[edge2.start];
+        // get the cross product of the two vectors
+        Cartesian3 crossProduct = vector1.cross(vector2).normalise();
+        // get the dot product of the cross product and the boundary normal
+        float dp = dotProduct(crossProduct, boundaryNormal);
+        // if the dot product is positive then the angle between the two edges is convex as the normal they create is pointing in the same direction as the boundary normal
+        if (dp > 0)
+        {
+            return i;
+        }
+    }
+    return 0;
+    // it isn't possible for no edge to be convex
+    std::cerr << "No concave edge found on boundary" << std::endl;
+    // print out the boundary
+    for (auto &edge: boundary)
+    {
+        std::cerr << "Edge: " << vertices[edge.start] << " " << vertices[edge.end] << std::endl;
+    }
+    exit(-4);
+}
+
+void Simplification::cleanUpNonManifoldEdges()
+{
+    std::cout << "cleaning" << std::endl;
+//    // delete any vertices that are not in any face
+//    std::vector<int> verticesToDelete;
+//    for (int i = 0; i < vertices.size(); i++)
+//    {
+//        bool found = false;
+//        for (auto &face: faces)
+//        {
+//            for (int j = 0; j < 3; j++)
+//            {
+//                if (face[j] == i)
+//                {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (found)
+//            {
+//                break;
+//            }
+//        }
+//        if (!found)
+//        {
+//            verticesToDelete.push_back(i);
+//        }
+//    }
+//    // for each vertex in each face
+//    for(auto &face:faces)
+//    {
+//        for (int i = 0; i < 3; i++)
+//        {
+//            // for each vertex to delete
+//            for (auto &vertexToDelete: verticesToDelete)
+//            {
+//                if (face[i] > vertexToDelete)
+//                {
+//                    face[i]--;
+//                }
+//            }
+//        }
+//    }
+//    std::cout << "Deleting " << verticesToDelete.size() << " loose vertices" << std::endl;
+//    for (int i = verticesToDelete.size() - 1; i >= 0; i--)
+//    {
+//        vertices.erase(vertices.begin() + verticesToDelete[i]);
+//    }
+    // search through the mesh for faces that have a back face and delete both faces
+    // so the loop stays fixed size we will store the faces to delete in a vector
+    std::vector<int> facesToDelete;
+    // for each face
+    for (int i = 0; i < faces.size(); i++)
+    {
+        // get the back face
+        Face backFace = {faces[i][1], faces[i][0], faces[i][2]};
+        // for each face once again
+        for (int j = i+1; j < faces.size(); j++)
+        {
+            int count = 0;
+            // if the back face is the same as the face
+            if (faces[j] == backFace)
+            {
+                // add the faces to delete
+                facesToDelete.push_back(i);
+                facesToDelete.push_back(j);
+            }
+        }
+    }
+    std::cout << "There are " << facesToDelete.size() / 2 << " faces to delete" << std::endl;
+    // delete the faces
+    for(int i = 0; i < facesToDelete.size(); i++)
+    {
+        // can't do it nicely with a swap in case one we want to delete is at the end
+        faces.erase(faces.begin() + facesToDelete[i]);
+        for (int j = i + 1; j < facesToDelete.size(); j++)
+        {
+            if (facesToDelete[j] > facesToDelete[i])
+            {
+                facesToDelete[j]--;
+            }
+        }
+    }
+//    // search the mesh for edges that have more than one paired edge
+//    // for each edge
+//    for(int i = 0; i < faces.size()*3; i++)
+//    {
+//        // get the face index
+//        int faceIndex = i / 3;
+//        // get the other half edge
+//        Edge otherHalfEdge = {faces[faceIndex][(i + 1) % 3], faces[faceIndex][(i) % 3]};
+//        std::vector<int> otherHalfFaceIndices = {faceIndex};
+//        std::vector<int> otherHalfThirdVertices = {faces[faceIndex][(i + 2) % 3]};
+//        // for each edge, check if it is the same as the other half edge
+//        int otherHalfCount = 0;
+//        for(int j = 0; j < faces.size()*3; j++)
+//        {
+//            if (i == j)
+//            {
+//                continue;
+//            }
+//            if (otherHalfEdge.exactlyEqual(Edge{faces[j / 3][(j) % 3], faces[j / 3][(j+1) % 3]}))
+//            {
+//                otherHalfCount++;
+//                otherHalfFaceIndices.push_back(j / 3);
+//                otherHalfThirdVertices.push_back(faces[j / 3][(j + 2) % 3]);
+//            }
+//        }
+//        if (otherHalfCount != 1)
+//        {
+//            // check through the other half face indices
+//            // if the third vertex is not present in any other face, then we have an extraneous edge
+//            for(int i=0; i<otherHalfCount; i++)
+//            {
+//                bool found = false;
+//                std::cout << "Searching for third vertex of face " << faces[otherHalfFaceIndices[i]][0] << " " << faces[otherHalfFaceIndices[i]][1] << " " << faces[otherHalfFaceIndices[i]][2] << std::endl;
+//                std::cout << "Third vertex is " << otherHalfThirdVertices[i] << std::endl;
+//                // for each face index
+//                for(int j = 0; j < faces.size(); j++)
+//                {
+//                    if (j == otherHalfFaceIndices[i])
+//                    {
+//                        continue;
+//                    }
+//                    // for each vertex in the face
+//                    for(int k = 0; k < 3; k++)
+//                    {
+//                        if (otherHalfThirdVertices[i] == faces[j][k])
+//                        {
+//                            // print out the vertex indices of the other face
+//                            std::cout << "Other face: " << faces[j][0] << " " << faces[j][1] << " " << faces[j][2] << std::endl;
+//                            found = true;
+//                            break;
+//                        }
+//                    }
+//                    if (found)
+//                    {
+//                        break;
+//                    }
+//                }
+//                if (!found)
+//                {
+//                    std::cerr << "Edge " << i << " is extraneous" << std::endl;
+//                    exit(-4);
+//                }
+//            }
+//            std::cout << "Edge " << i << " has " << otherHalfCount << " other half edges" << std::endl;
+//            std::cout << "This is in triangle " << faces[faceIndex][0] << " " << faces[faceIndex][1] << " " << faces[faceIndex][2] << std::endl;
+//            //exit(-4);
+//        }
+//    }
+
+    // recompute the directed edges and other half
+    //constructDirectedEdges();
 }
 
 
