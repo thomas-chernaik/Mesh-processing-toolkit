@@ -1,4 +1,4 @@
-The program will write the simplified file to the same location, as a .tri file with the same name as the input file with "_simplified" appended to the filename.
+The program will write the simplified file to the same location, as a .tri file with the same name as the input file with "_simplified_<iterations>_iterations" appended to the filename.
 
 If the mesh can't be simplified as many times as requested, then the program will output a file simplified as much as possible.
 

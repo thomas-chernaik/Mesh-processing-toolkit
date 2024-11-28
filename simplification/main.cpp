@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     // simplify the mesh
     smp.simplifyMesh(maxIterations);
     // write the repaired mesh to the same filetype as the input
-    filenameWithoutExtension = filenameWithoutExtension + "_simplified";
+    filenameWithoutExtension = filenameWithoutExtension + "_simplified_" + std::to_string(maxIterations) + "_iterations";
     smp.writeRepairedMeshTri(filenameWithoutExtension);
 //
 // because of the nature of operations on the mesh, the mesh is always written as a .tri file for now
