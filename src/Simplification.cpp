@@ -142,14 +142,19 @@ int Simplification::findSmallestCurvature(int n)
     // return the nth smallest curvature
     // get the curvatures in a vector
 
-    std::vector<float> curvaturesVector;
-    curvaturesVector.reserve(curvatures.size());
+    std::vector<float> curvaturesVector(vertices.size(), std::numeric_limits<float>::max());
+    // set the indices to 0 - vertices.size() - 1
     std::vector<int> curvaturesIndices;
-    curvaturesIndices.reserve(curvatures.size());
+    curvaturesIndices.reserve(vertices.size());
+    for(int i = 0; i < vertices.size(); i++)
+    {
+        curvaturesIndices.push_back(i);
+    }
+    // iterate across the curvatures dictionary and update the vectors where needed
+    int i = 0;
     for (auto &curvature: curvatures)
     {
-        curvaturesVector.push_back(curvature.second);
-        curvaturesIndices.push_back(curvature.first);
+        curvaturesVector[curvature.first] = curvature.second;
     }
     // sort the indices by the curvatures
     std::sort(curvaturesIndices.begin(), curvaturesIndices.end(), [&curvaturesVector](int i1, int i2)
@@ -178,7 +183,7 @@ bool Simplification::removeVertex(int vertexIndex)
     // store the vertex that is being removed
     removedVertexIndex = vertexIndex;
     holeEdges.clear();
-    holeFaces.clear();
+    //holeFaces.clear();
     int faceIndex = 0;
     // remove any faces that contain the vertex, and add the edges of the hole to the holeEdges vector
     for (int i = 0; i < faces.size(); i++)
@@ -186,7 +191,7 @@ bool Simplification::removeVertex(int vertexIndex)
         Face face = faces[i];
         if (face[0] == vertexIndex)
         {
-            holeFaces.insert(faceIndex);
+            //holeFaces.insert(faceIndex);
             holeEdges.push_back({face[1], face[2]});
             // remove the face
             faces[i] = faces.back();
@@ -194,7 +199,7 @@ bool Simplification::removeVertex(int vertexIndex)
             i--;
         } else if (face[1] == vertexIndex)
         {
-            holeFaces.insert(faceIndex);
+            //holeFaces.insert(faceIndex);
             holeEdges.push_back({face[2], face[0]});
             // remove the face
             faces[i] = faces.back();
@@ -202,7 +207,7 @@ bool Simplification::removeVertex(int vertexIndex)
             i--;
         } else if (face[2] == vertexIndex)
         {
-            holeFaces.insert(faceIndex);
+            //holeFaces.insert(faceIndex);
             holeEdges.push_back({face[0], face[1]});
             // remove the face
             faces[i] = faces.back();
