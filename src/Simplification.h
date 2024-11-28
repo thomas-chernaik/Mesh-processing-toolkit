@@ -43,7 +43,7 @@ private:
     std::vector<int> getOneRingVertices(int vertexIndex);
 
     // method to get the angle between two vectors
-    float getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vector2);
+    static float getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vector2);
 
     // method to remove a vertex from the mesh and triangulate the hole
     // returns false if it does not maintain the eulerian condition

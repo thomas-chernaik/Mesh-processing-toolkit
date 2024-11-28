@@ -25,6 +25,11 @@ void Simplification::simplifyMesh(int maxIterations)
 //    std::cout << "Starting genus: " << startingGenus << std::endl;
     // generate the set of curvatures
     generateCurvatures();
+    if(maxIterations > vertices.size() - 4)
+    {
+        std::cout << "There are only " << vertices.size() << " so it wouldn't make sense to simplify more than that" << std::endl;
+        exit(-1);
+    }
     std::cout << "Simplifying the mesh" << std::endl;
     for (int i = 0; i < maxIterations; i++)
     {
@@ -45,7 +50,7 @@ void Simplification::simplifyMesh(int maxIterations)
         int currentVertex = 0;
         int smallestCurvature = findSmallestCurvature(0);
         // print out the vertex with the smallest curvature
-        while (!removed && currentVertex < vertices.size())
+        while (!removed && currentVertex < vertices.size() - i)
         {
             //std::cout << "Smallest curvature: " << vertices[smallestCurvature] << std::endl;
             try
@@ -68,7 +73,7 @@ void Simplification::simplifyMesh(int maxIterations)
             }
             catch(std::exception &e)
             {
-                printProgress(100);
+                std::cout << std::endl;
                 std::cout << "Cannot continue simplification because of error: " << e.what() << std::endl;
                 std::cout << "Simplified mesh for a total vertex reduction of " << i << std::endl;
                 //cleanUpNonManifoldEdges();
@@ -136,9 +141,10 @@ int Simplification::findSmallestCurvature(int n)
     }
     // return the nth smallest curvature
     // get the curvatures in a vector
+
     std::vector<float> curvaturesVector;
     curvaturesVector.reserve(curvatures.size());
-    std::vector<float> curvaturesIndices;
+    std::vector<int> curvaturesIndices;
     curvaturesIndices.reserve(curvatures.size());
     for (auto &curvature: curvatures)
     {
@@ -269,7 +275,8 @@ float Simplification::findGaussianCurvature(int vertexIndex)
     }
     // get the first vertex of each edge
     std::vector<int> oneRingVertices;
-    for (auto &edge: orderedOneRingEdges)
+    oneRingVertices.reserve(orderedOneRingEdges.size());
+for (auto &edge: orderedOneRingEdges)
     {
         oneRingVertices.push_back(edge.start);
     }
@@ -456,7 +463,8 @@ std::vector<int> Simplification::getOneRingVertices(int vertexIndex)
     std::vector<Edge> oneRingEdges = getOneRing(vertexIndex);
     // get the one ring vertices
     std::vector<int> oneRingVertices;
-    for (auto &edge: oneRingEdges)
+    oneRingVertices.reserve(oneRingEdges.size());
+for (auto &edge: oneRingEdges)
     {
         oneRingVertices.push_back(edge.end);
     }
@@ -625,7 +633,6 @@ void Simplification::cleanUpNonManifoldEdges()
         // for each face once again
         for (int j = 0; j < faces.size() - facesAdded; j++)
         {
-            int count = 0;
             // if the back face is the same as the face
             if (faces[j] == backFace)
             {
@@ -683,15 +690,12 @@ bool Simplification::testNonManifoldEdges()
         }
     }
     // if the counts aren't all 2 then we have a non-manifold edge
-    for (auto &count: edgeCounts)
+    if(std::ranges::all_of(edgeCounts, [](int count){return count == 2;}))
     {
-        if (count != 2)
-        {
-            //std::cerr << "Non-manifold edge detected" << std::endl;
-            return false;
-        }
+        return true;
     }
-    return true;
+    // if we have a non-manifold edge then we need to backtrack
+    return false;
 }
 
 
