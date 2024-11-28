@@ -77,7 +77,7 @@ void Simplification::simplifyMesh(int maxIterations)
                 std::cout << "Cannot continue simplification because of error: " << e.what() << std::endl;
                 std::cout << "Simplified mesh for a total vertex reduction of " << i << std::endl;
                 //cleanUpNonManifoldEdges();
-                writeObjFile("final");
+                //writeObjFile("final");
                 return;
             }
         }
@@ -114,7 +114,7 @@ void Simplification::simplifyMesh(int maxIterations)
     std::cout << "Simplified mesh for a total vertex reduction of " << maxIterations << std::endl;
     // -debug - write an obj file
     //cleanUpNonManifoldEdges();
-    writeObjFile("final");
+    //writeObjFile("final");
 }
 
 int Simplification::findSmallestCurvature(int n)
@@ -151,7 +151,6 @@ int Simplification::findSmallestCurvature(int n)
         curvaturesIndices.push_back(i);
     }
     // iterate across the curvatures dictionary and update the vectors where needed
-    int i = 0;
     for (auto &curvature: curvatures)
     {
         curvaturesVector[curvature.first] = curvature.second;
