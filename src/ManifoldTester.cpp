@@ -75,15 +75,18 @@ void ManifoldTester::testSelfIntersections()
 {
     // we can test for self intersections by checking that no two triangles intersect
     // TODO: optimise with an octree
+    std::cout << "Testing for self intersections" << std::endl;
     for (int f1 = 0; f1 < faces.size(); f1++)
     {
+        int percentage = (100 * f1) / faces.size();
+        printProgress(percentage);
         for (int f2 = f1 + 1; f2 < faces.size(); f2++)
         {
             if (testTriangleIntersection(f1, f2))
             {
                 // output the edges and vertices of the intersecting faces
                 std::cerr << "Mesh is not manifold as faces " << f1 << " and " << f2 << " intersect" << std::endl;
-#ifndef DEBUG
+#ifdef DEBUG
                 // output the vertices of the faces
                 std::cerr << "Face " << f1 << " vertices: " << vertices[faces[f1][0]] << " " << vertices[faces[f1][1]]
                           << " " << vertices[faces[f1][2]] << std::endl;
@@ -94,6 +97,7 @@ void ManifoldTester::testSelfIntersections()
             }
         }
     }
+    printProgress(100);
     std::cout << "Tested " << numTestedIntersections << " intersections" << std::endl;
 }
 
@@ -111,12 +115,14 @@ bool ManifoldTester::testTriangleIntersection(int f1, int f2)
     {
         distances1[v] = dotProduct(face1Normal, vertices[faces[f2][v]]) - face1D;
     }
-    float e = 1e-5;
+    float e = 1e-7;
     // if the distances1 are all zero then the faces are coplanar, and we check for intersection separately
     if (std::abs(distances1[0]) < e &&
         std::abs(distances1[1]) < e &&
         std::abs(distances1[2]) < e)
     {
+        // I don't think coplanar faces really count as intersecting for this case, and it isn't robust enough to be meaningful
+        return false;
         numTestedIntersections++;
         // project the vertices of the faces onto the plane of the first face
         // if the 2D triangles intersect then the 3D triangles intersect

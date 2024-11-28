@@ -115,7 +115,6 @@ void DirectedEdge::readFile(const std::string& filename)
 
 void DirectedEdge::constructDirectedEdges()
 {
-    std::cout << "Constructing the directed edges and other halves for the whole mesh, which may take a few seconds for large meshes" << std::endl;
     // start a timer
     auto start = std::chrono::high_resolution_clock::now();
     // clear the directed edges and other half vectors
@@ -126,9 +125,12 @@ void DirectedEdge::constructDirectedEdges()
     // we will have numFaces * 3 other half edges
     otherHalf.resize(faces.size() * 3, -1);
     // TODO: optimise - this is currently O(v * e) where v is the number of vertices and e is the number of edges
+    std::cout << "Constructing directed edges" << std::endl;
     // for each directed edge
     for (int i = 0; i < directedEdges.size(); i++)
     {
+        int percentage = (i*100) / directedEdges.size();
+        printProgress(percentage);
         // find the first face that contains this vertex
         for (int f = 0; f < faces.size(); f++)
         {
@@ -160,6 +162,7 @@ void DirectedEdge::constructDirectedEdges()
             error("Mesh is not manifold as vertex " + std::to_string(i) + " is not in any face", -4);
         }
     }
+    printProgress(100);
     // stop the timer
     auto stop = std::chrono::high_resolution_clock::now();
     // output the time taken
@@ -169,9 +172,12 @@ void DirectedEdge::constructDirectedEdges()
 
 
     start = std::chrono::high_resolution_clock::now();
+    std::cout << "Constructing other half edges" << std::endl;
     // for each edge
     for (int e = 0; e < otherHalf.size(); e++)
     {
+        int percentage = (e*100) / otherHalf.size();
+        printProgress(percentage);
         if (otherHalf[e] != -1)
         {
             continue;
@@ -192,6 +198,7 @@ void DirectedEdge::constructDirectedEdges()
                 // if there is already another half then we don't have a manifold mesh
                 if (otherHalf[e] != -1 || otherHalf[e2] != -1)
                 {
+                    std::cout << std::endl;
                     error("Mesh is not manifold as edge " + std::to_string(e) + " has multiple other halves", -4);
                 }
                 // set the other half to be the edge index
@@ -202,15 +209,18 @@ void DirectedEdge::constructDirectedEdges()
             // if the edge is the same as the first edge then we don't have a manifold mesh
             if (faces[e2 / 3][e2 % 3] == vStart && faces[e2 / 3][(e2 + 1) % 3] == vEnd)
             {
+                std::cout << std::endl;
                 error("Mesh is not manifold as edge " + std::to_string(e) + " exists on multiple faces", -4);
             }
         }
         // if we didn't find another half then we don't have a manifold mesh
         if (otherHalf[e] == -1)
         {
+            std::cout << std::endl;
             error("Mesh is not manifold as edge " + std::to_string(e) + " has no other half", -4);
         }
     }
+    printProgress(100);
     // stop the timer
     stop = std::chrono::high_resolution_clock::now();
     // output the time taken

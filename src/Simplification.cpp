@@ -6,6 +6,8 @@
 #include <cmath>
 #include "Simplification.h"
 
+
+
 void Simplification::simplifyMesh(int maxIterations)
 {
     // TODO: work out exit conditions
@@ -23,6 +25,7 @@ void Simplification::simplifyMesh(int maxIterations)
 //    std::cout << "Starting genus: " << startingGenus << std::endl;
     // generate the set of curvatures
     generateCurvatures();
+    std::cout << "Simplifying the mesh" << std::endl;
     for (int i = 0; i < maxIterations; i++)
     {
         //cleanUpNonManifoldEdges();
@@ -33,8 +36,9 @@ void Simplification::simplifyMesh(int maxIterations)
 //        if (i == 11536)
 //            writeRepairedMeshTri("iteration" + std::to_string(i));
 
-        std::cout << "Iteration " << i << std::endl;
-
+        // progress bar
+        int percentage = (i * 100) / maxIterations;
+        printProgress(percentage);
 
         //writeRepairedMeshTri("iteration" + std::to_string(i));
         removed = false;
@@ -43,12 +47,12 @@ void Simplification::simplifyMesh(int maxIterations)
         // print out the vertex with the smallest curvature
         while (!removed && currentVertex < vertices.size())
         {
-            std::cout << "Smallest curvature: " << vertices[smallestCurvature] << std::endl;
+            //std::cout << "Smallest curvature: " << vertices[smallestCurvature] << std::endl;
             try
             {
                 if (!removeVertex(smallestCurvature))
                 {
-                    std::cout << "backtracking" << std::endl;
+                    //std::cout << "backtracking" << std::endl;
                     // if we can't remove the vertex then we need to backtrack
                     backtrack();
                     currentVertex++;
@@ -58,43 +62,54 @@ void Simplification::simplifyMesh(int maxIterations)
                     removed = true;
                     // update the curvatures
                     updateCurvatures();
+                    // repair the mesh
+                    //cleanUpNonManifoldEdges();
                 }
             }
             catch(std::exception &e)
             {
+                printProgress(100);
                 std::cout << "Cannot continue simplification because of error: " << e.what() << std::endl;
-                cleanUpNonManifoldEdges();
-                //writeObjFile("final");
+                std::cout << "Simplified mesh for a total vertex reduction of " << i << std::endl;
+                //cleanUpNonManifoldEdges();
+                writeObjFile("final");
                 return;
             }
         }
-        // update the component
-        // remove the faces in holeFaces from the component
-        int numRemoved = 0;
-        for(int j = 0; j < components.size(); j++)
+        if(!removed)
         {
-            // if the component is in hole faces, swap it with the last - numRemoved component
-            if (holeFaces.find(j - numRemoved) != holeFaces.end())
-            {
-                std::swap(components[j - numRemoved], components[components.size() - numRemoved - 1]);
-                numRemoved++;
-            }
-
+            //std::cout << "No vertex can be removed without breaking the eulerian condition" << std::endl;
+            break;
         }
-        // remove the last numRemoved components
-        components.resize(components.size() - numRemoved);
-        // now add in the new faces
-        // these are faces indexed at the end of the faces vector, so faces.size() - facesAdded to faces.size()
-        for(int j = faces.size() - facesAdded; j < faces.size(); j++)
-        {
-            components[0].push_back(j);
-        }
+//        // update the component
+//        // remove the faces in holeFaces from the component
+//        int numRemoved = 0;
+//        for(int j = 0; j < components.size(); j++)
+//        {
+//            // if the component is in hole faces, swap it with the last - numRemoved component
+//            if (holeFaces.find(j - numRemoved) != holeFaces.end())
+//            {
+//                std::swap(components[j - numRemoved], components[components.size() - numRemoved - 1]);
+//                numRemoved++;
+//            }
+//
+//        }
+//        // remove the last numRemoved components
+//        components.resize(components.size() - numRemoved);
+//        // now add in the new faces
+//        // these are faces indexed at the end of the faces vector, so faces.size() - facesAdded to faces.size()
+//        for(int j = faces.size() - facesAdded; j < faces.size(); j++)
+//        {
+//            components[0].push_back(j);
+//        }
 
 
     }
+    printProgress(100);
+    std::cout << "Simplified mesh for a total vertex reduction of " << maxIterations << std::endl;
     // -debug - write an obj file
-    cleanUpNonManifoldEdges();
-    //writeObjFile("final");
+    //cleanUpNonManifoldEdges();
+    writeObjFile("final");
 }
 
 int Simplification::findSmallestCurvature(int n)
@@ -191,13 +206,13 @@ bool Simplification::removeVertex(int vertexIndex)
         faceIndex++;
     }
     int previousFaces = (int) faces.size();
-    std::cout << "filling hole with " << holeEdges.size() << " edges" << std::endl;
+    //std::cout << "filling hole with " << holeEdges.size() << " edges" << std::endl;
     // triangulate the hole
     triangulateHole(holeEdges);
     facesAdded = (int) faces.size() - previousFaces;
 
     // check that the mesh is still eulerian
-    return isEulerian();
+    return testNonManifoldEdges();
 }
 
 
@@ -404,18 +419,34 @@ float Simplification::getAngleBetweenVectors(Cartesian3 vector1, Cartesian3 vect
 
 bool Simplification::isEulerian()
 {
-    return true;
-    // here we check that the mesh is manifold
-    // first we check that the eulerian condition is satisfied.
-    // test the genus of the mesh on component 0
-    int genus = CalculateGenus()[0];
-    // if the genus is not the same as the starting genus then the mesh is not eulerian
+    // calculate the genus of the mesh
+    // the built in function won't work since we may have multiple components
+    // genus = 1 - (V - E + F) / 2
+    // F = faces.size()
+    // E can be calculated as the number of unique undirected edges in the faces
+    // V can be calculated as the number of unique vertices in the faces
+    int F = (int) faces.size();
+    std::unordered_set<int> uniqueVertices;
+    std::unordered_set<Edge, EdgeHash> uniqueEdges;
+    for (auto &face: faces)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            uniqueVertices.insert(face[i]);
+            uniqueEdges.insert({face[i], face[(i + 1) % 3]});
+        }
+    }
+    int E = (int) uniqueEdges.size();
+    int V = (int) uniqueVertices.size();
+    int genus = 1 - (V - E + F) / 2;
+    // if the genus isn't the same as the starting genus then the mesh is not eulerian
     if (genus != startingGenus)
     {
-        std::cerr << "Genus is not the same as the starting genus" << std::endl;
+        //std::cerr << "Genus is not the same as the starting genus" << std::endl;
         //exit(-2);
         return false;
     }
+
     return true;
 }
 
@@ -586,13 +617,13 @@ void Simplification::cleanUpNonManifoldEdges()
     // search through the mesh for faces that have a back face and delete both faces
     // so the loop stays fixed size we will store the faces to delete in a vector
     std::vector<int> facesToDelete;
-    // for each face
-    for (int i = 0; i < faces.size(); i++)
+    // for each face thats newly added
+    for (int i = faces.size() - facesAdded - 1; i < faces.size(); i++)
     {
         // get the back face
         Face backFace = {faces[i][1], faces[i][0], faces[i][2]};
         // for each face once again
-        for (int j = i+1; j < faces.size(); j++)
+        for (int j = 0; j < faces.size() - facesAdded; j++)
         {
             int count = 0;
             // if the back face is the same as the face
@@ -606,7 +637,7 @@ void Simplification::cleanUpNonManifoldEdges()
     }
     std::cout << "There are " << facesToDelete.size() / 2 << " faces to delete" << std::endl;
     // delete the faces
-    for(int i = 0; i < facesToDelete.size(); i++)
+    for (int i = 0; i < facesToDelete.size(); i++)
     {
         // can't do it nicely with a swap in case one we want to delete is at the end
         faces.erase(faces.begin() + facesToDelete[i]);
@@ -618,77 +649,49 @@ void Simplification::cleanUpNonManifoldEdges()
             }
         }
     }
-//    // search the mesh for edges that have more than one paired edge
-//    // for each edge
-//    for(int i = 0; i < faces.size()*3; i++)
-//    {
-//        // get the face index
-//        int faceIndex = i / 3;
-//        // get the other half edge
-//        Edge otherHalfEdge = {faces[faceIndex][(i + 1) % 3], faces[faceIndex][(i) % 3]};
-//        std::vector<int> otherHalfFaceIndices = {faceIndex};
-//        std::vector<int> otherHalfThirdVertices = {faces[faceIndex][(i + 2) % 3]};
-//        // for each edge, check if it is the same as the other half edge
-//        int otherHalfCount = 0;
-//        for(int j = 0; j < faces.size()*3; j++)
-//        {
-//            if (i == j)
-//            {
-//                continue;
-//            }
-//            if (otherHalfEdge.exactlyEqual(Edge{faces[j / 3][(j) % 3], faces[j / 3][(j+1) % 3]}))
-//            {
-//                otherHalfCount++;
-//                otherHalfFaceIndices.push_back(j / 3);
-//                otherHalfThirdVertices.push_back(faces[j / 3][(j + 2) % 3]);
-//            }
-//        }
-//        if (otherHalfCount != 1)
-//        {
-//            // check through the other half face indices
-//            // if the third vertex is not present in any other face, then we have an extraneous edge
-//            for(int i=0; i<otherHalfCount; i++)
-//            {
-//                bool found = false;
-//                std::cout << "Searching for third vertex of face " << faces[otherHalfFaceIndices[i]][0] << " " << faces[otherHalfFaceIndices[i]][1] << " " << faces[otherHalfFaceIndices[i]][2] << std::endl;
-//                std::cout << "Third vertex is " << otherHalfThirdVertices[i] << std::endl;
-//                // for each face index
-//                for(int j = 0; j < faces.size(); j++)
-//                {
-//                    if (j == otherHalfFaceIndices[i])
-//                    {
-//                        continue;
-//                    }
-//                    // for each vertex in the face
-//                    for(int k = 0; k < 3; k++)
-//                    {
-//                        if (otherHalfThirdVertices[i] == faces[j][k])
-//                        {
-//                            // print out the vertex indices of the other face
-//                            std::cout << "Other face: " << faces[j][0] << " " << faces[j][1] << " " << faces[j][2] << std::endl;
-//                            found = true;
-//                            break;
-//                        }
-//                    }
-//                    if (found)
-//                    {
-//                        break;
-//                    }
-//                }
-//                if (!found)
-//                {
-//                    std::cerr << "Edge " << i << " is extraneous" << std::endl;
-//                    exit(-4);
-//                }
-//            }
-//            std::cout << "Edge " << i << " has " << otherHalfCount << " other half edges" << std::endl;
-//            std::cout << "This is in triangle " << faces[faceIndex][0] << " " << faces[faceIndex][1] << " " << faces[faceIndex][2] << std::endl;
-//            //exit(-4);
-//        }
-//    }
-
-    // recompute the directed edges and other half
-    //constructDirectedEdges();
+}
+bool Simplification::testNonManifoldEdges()
+{
+    // only the edges that have recently been effected could be non-manifold
+    // these are the edges that are in the newly added faces
+    // we should see these edges exactly twice in the faces vector (order independent)
+    std::vector<Edge> affectedEdges;
+    for(int i = faces.size() - facesAdded - 1; i < faces.size(); i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            Edge edge = {faces[i][j], faces[i][(j + 1) % 3]};
+            affectedEdges.push_back(edge);
+        }
+    }
+    std::vector<int> edgeCounts(affectedEdges.size(), 0);
+    // for each face
+    for (auto &face: faces)
+    {
+        // for each edge in the face
+        for (int i = 0; i < 3; i++)
+        {
+            Edge edgeInFace = {face[i], face[(i + 1) % 3]};
+            // for each edge in the hole
+            for (int j = 0; j < affectedEdges.size(); j++)
+            {
+                if (edgeInFace == affectedEdges[j])
+                {
+                    edgeCounts[j]++;
+                }
+            }
+        }
+    }
+    // if the counts aren't all 2 then we have a non-manifold edge
+    for (auto &count: edgeCounts)
+    {
+        if (count != 2)
+        {
+            //std::cerr << "Non-manifold edge detected" << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 

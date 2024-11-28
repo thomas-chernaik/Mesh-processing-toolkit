@@ -20,4 +20,15 @@ struct Edge
     }
 };
 
+// hashing struct for the edge
+// I want edges to be equal if they have the same start and end, regardless of the order
+// so for the hash we will add the two together
+struct EdgeHash
+{
+    std::size_t operator()(const Edge &edge) const
+    {
+        return std::hash<int>()(edge.start + edge.end);
+    }
+};
+
 #endif //MODELLINGCWK1_EDGE_H

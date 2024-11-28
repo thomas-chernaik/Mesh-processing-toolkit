@@ -9,6 +9,8 @@
 #include "MeshRepair.h"
 #include "../triangle_renderer/Cartesian3.h"
 #include <unordered_set>
+#include "progressBar.h"
+
 
 class Simplification : public MeshRepair
 {
@@ -74,6 +76,9 @@ private:
 
     // method to clean up non-manifold edges
     void cleanUpNonManifoldEdges();
+
+    // method to test for non-manifold edges
+    bool testNonManifoldEdges();
 
 
     // dictionary of curvatures - key is the vertex index, value is the curvature

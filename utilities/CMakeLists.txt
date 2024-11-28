@@ -5,7 +5,9 @@ project(utilities)
 
 # Add the library
 add_library(utilities vertex.cpp face.cpp
-        edge.h)
+        edge.h
+        progressBar.h
+        progressBar.cpp)
 
 # Specify include directories for the library
 target_include_directories(utilities PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
