@@ -2,7 +2,7 @@
 - face2faceindex: Converts raw triangle soup files (.tri) to a face-indexed format (.face).
 - faceindex2directededge: Constructs a directed-edge (half-edge) structure from face-indexed files, outputting .diredge files for efficient traversal.
 -  Manifold Validation: Detects non-manifold edges and vertices, flagging issues in a results file.
-- Topological Analysis: Computes surface genus using Euler’s formula for valid manifold meshes.
+- Topological Analysis (part of the manifold testing): Computes surface genus using Euler’s formula for valid manifold meshes.
 - Automated Repair: Closes holes in meshes by walking boundary edges and averaging vertex positions.
 - Curvature-Driven Simplification: Reduces mesh complexity using Gaussian curvature metrics while preserving topological integrity.
 
